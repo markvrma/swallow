@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #4A483F; text-decoration: none; }
+    a:hover { color: #26251F; text-decoration: underline; }
+    .hv { transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear; }
+    .hv-ghost:hover { background: #D7D4CB; border-color: #7F7C72; color: #26251F; }
+    .hv-bright:hover { background: #17409F; }
+  </style>
+</helmet>
+
+<div style="min-height: 820px; background: #E4E2DC; color: #26251F; display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px; height: 56px; border-bottom: 1px solid #C3BFB4; background: #DEDBD3;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.06em;">swallow</span>
+      <span style="font-size: 11px; color: #8A877D; letter-spacing: 0.02em;">stop choosing</span>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #B33124; letter-spacing: -0.01em;">
+      Time you've spent deliberating : <span style="font-weight: 500;">{{minutes}}</span> {{label}}
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;">
+
+    <div style="max-width: 560px; text-align: center; margin-bottom: 52px;">
+      <h1 style="margin: 0; font-size: 34px; font-weight: 500; line-height: 1.25; letter-spacing: -0.015em; text-wrap: pretty;">You already know what you like.</h1>
+      <p style="margin: 16px 0 0; font-size: 15px; line-height: 1.65; color: #5C5A52; text-wrap: pretty;">
+        Swallow keeps your shows and hands you one episode. No grid to scroll, no thumbnails
+        competing for you, no autoplaying trailer. One button, one answer.
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; width: 340px;">
+      <button class="hv hv-bright" style="display: flex; align-items: center; justify-content: center; gap: 12px; font-family: inherit; font-size: 18px; font-weight: 600; color: #FFFFFF; background: #2050C8; border: 1px solid #2050C8; border-radius: 0; padding: 20px 0; cursor: pointer;">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="15" height="15"/><circle cx="6.8" cy="6.8" r="1.15" fill="currentColor" stroke="none"/><circle cx="10" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="13.2" cy="13.2" r="1.15" fill="currentColor" stroke="none"/></svg>
+        Random
+      </button>
+      <button class="hv hv-ghost" style="font-family: inherit; font-size: 14px; font-weight: 500; color: #4A483F; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 13px 0; cursor: pointer;">Controlled random</button>
+      <button class="hv hv-ghost" style="font-family: inherit; font-size: 14px; font-weight: 500; color: #4A483F; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 13px 0; cursor: pointer;">Create an account</button>
+    </div>
+
+    <p style="margin: 26px 0 0; font-size: 11px; color: #A5A196; text-align: center;">
+      Random and controlled random need to know your shows first.
+    </p>
+
+  </div>
+
+  <div style="padding: 0 40px 28px; display: flex; justify-content: center;">
+    <p style="margin: 0; max-width: 620px; text-align: center; font-size: 11px; line-height: 1.7; color: #A5A196;">
+      Already have an account? <a href="#">Sign in</a>
+    </p>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"minutes":{"editor":"int","default":1,"min":0,"max":240,"unit":"min","section":"Timer"},"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { seconds: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ seconds: this.state.seconds + 1 }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const minutes = (this.props.minutes ?? 1) + Math.floor(this.state.seconds / 60);
+    return { minutes, label: minutes === 1 ? 'minute' : 'minutes' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #9A968B; } a:hover { color: #D8D5CC; }
+    .hv { transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear; }
+    .hv-ghost:hover { background: #2A2A26; border-color: #55534B; color: #D8D5CC; }
+    .hv-bright:hover { background: #2E5BC4; }
+    .hv-card:hover { border-color: #55534B; background: #232320; }
+    .hv-chip:hover { background: #2A2A26; border-color: #55534B; }
+    .hv-icon:hover { background: #2A2A26; border-color: #55534B; color: #D8D5CC; }
+    input::placeholder { color: #605D55; }
+    input:focus { outline: none; border-color: #55534B; }
+  </style>
+</helmet>
+
+<div style="min-height: 700px; background: #1B1B18; color: #D8D5CC;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px; height: 56px; border-bottom: 1px solid #33322C; background: #201F1C;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.06em;">swallow</span>
+      <span style="font-size: 11px; color: #6E6B62;">stop choosing</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #D9584A;">
+        Time you've spent deliberating : <span style="font-weight: 500;">{{minutes}}</span> {{label}}
+      </div>
+      <span style="width: 1px; height: 18px; background: #33322C;"></span>
+      <span style="font-size: 12px; color: #6E6B62;">mark@swallow.tv</span>
+      <button class="hv hv-ghost" style="font-family: inherit; font-size: 12px; color: #9A968B; background: transparent; border: 1px solid #33322C; border-radius: 0; padding: 5px 11px; cursor: pointer;">Sign out</button>
+    </div>
+  </div>
+
+  <div style="padding: 32px 40px 48px;">
+
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 36px;">
+      <div style="display: flex; align-items: center; gap: 8px; border: 1px solid #33322C; background: #232320; padding: 0 11px; height: 34px; width: 300px;">
+        <span style="color: #605D55; display: flex;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 L14 14"/></svg></span>
+        <input placeholder="Search your shows" style="font-family: inherit; font-size: 13px; color: #D8D5CC; border: none; background: transparent; width: 100%; padding: 0;">
+      </div>
+      <button class="hv hv-icon" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid #33322C; background: #232320; color: #9A968B; border-radius: 0; cursor: pointer;">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>
+      </button>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-bottom: 40px;">
+      <button class="hv hv-bright" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: inherit; font-size: 19px; font-weight: 600; color: #FFFFFF; background: #3D6FE8; border: 1px solid #3D6FE8; border-radius: 0; padding: 30px 0; cursor: pointer;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="15" height="15"/><circle cx="6.8" cy="6.8" r="1.15" fill="currentColor" stroke="none"/><circle cx="10" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="13.2" cy="13.2" r="1.15" fill="currentColor" stroke="none"/></svg>
+        Random
+      </button>
+      <button class="hv hv-ghost" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: inherit; font-size: 19px; font-weight: 500; color: #9A968B; background: transparent; border: 1px solid #33322C; border-radius: 0; padding: 30px 0; cursor: pointer;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 6.5h8M15.5 6.5h1.5M3 13.5h2.5M9.5 13.5h7.5"/><circle cx="13" cy="6.5" r="2"/><circle cx="7.5" cy="13.5" r="2"/></svg>
+        Controlled random
+      </button>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+      <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6E6B62; margin-bottom: 12px;">Saved controlled randoms</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <button class="hv hv-chip" style="display: flex; align-items: baseline; gap: 9px; font-family: inherit; font-size: 13px; color: #9A968B; background: #232320; border: 1px solid #33322C; border-radius: 0; padding: 8px 13px; cursor: pointer;">Half-hour comfort <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #605D55;">&le;30m</span></button>
+        <button class="hv hv-chip" style="display: flex; align-items: baseline; gap: 9px; font-family: inherit; font-size: 13px; color: #9A968B; background: #232320; border: 1px solid #33322C; border-radius: 0; padding: 8px 13px; cursor: pointer;">Late seasons only <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #605D55;">any</span></button>
+        <button class="hv hv-chip" style="font-family: inherit; font-size: 13px; color: #605D55; background: transparent; border: 1px dashed #33322C; border-radius: 0; padding: 8px 13px; cursor: pointer;">New&hellip;</button>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6E6B62; margin-bottom: 12px;">Pick one, or don't</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
+        <button class="hv hv-card" style="display: flex; flex-direction: column; text-align: left; font-family: inherit; background: #201F1C; border: 1px solid #33322C; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #2A2A26;"><span style="display: block; font-size: 16px; font-weight: 500; color: #D8D5CC;">The Office</span><span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">S1&ndash;9</span></span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">142 / 188 left</span>
+        </button>
+        <button class="hv hv-card" style="display: flex; flex-direction: column; text-align: left; font-family: inherit; background: #201F1C; border: 1px solid #33322C; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #2A2A26;"><span style="display: block; font-size: 16px; font-weight: 500; color: #D8D5CC;">Seinfeld</span><span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">S3&ndash;7</span></span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">88 / 112 left</span>
+        </button>
+        <button class="hv hv-card" style="display: flex; flex-direction: column; text-align: left; font-family: inherit; background: #201F1C; border: 1px solid #33322C; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #2A2A26;"><span style="display: block; font-size: 16px; font-weight: 500; color: #D8D5CC;">Frasier</span><span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">S1&ndash;11</span></span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">201 / 264 left</span>
+        </button>
+        <button class="hv hv-card" style="display: flex; flex-direction: column; text-align: left; font-family: inherit; background: #201F1C; border: 1px solid #33322C; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #2A2A26;"><span style="display: block; font-size: 16px; font-weight: 500; color: #D8D5CC;">Taskmaster</span><span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">S6&ndash;16</span></span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">47 / 60 left</span>
+        </button>
+        <button class="hv hv-card" style="display: flex; flex-direction: column; text-align: left; font-family: inherit; background: #201F1C; border: 1px solid #33322C; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #2A2A26;"><span style="display: block; font-size: 16px; font-weight: 500; color: #D8D5CC;">Bob's Burgers</span><span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">S4&ndash;9</span></span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E6B62;">63 / 132 left</span>
+        </button>
+      </div>
+      <div style="margin-top: 11px; font-size: 11px; color: #605D55;">Five of eleven shows. Fewer options, faster decisions.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"minutes":{"editor":"int","default":3,"min":0,"max":240,"unit":"min","section":"Timer"},"$preview":{"width":1280,"height":700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { seconds: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ seconds: this.state.seconds + 1 }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const minutes = (this.props.minutes ?? 3) + Math.floor(this.state.seconds / 60);
+    return { minutes, label: minutes === 1 ? 'minute' : 'minutes' };
+  }
+}
+</script>
+</body>
+</html>

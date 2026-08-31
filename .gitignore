@@ -17,3 +17,7 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Seeded design canvas — regenerate from design/*.dc.html + canvas.json
+design/*.html
+!design/*.dc.html

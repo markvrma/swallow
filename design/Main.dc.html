@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #4A483F; text-decoration: none; }
+    a:hover { color: #26251F; text-decoration: underline; }
+    .hv { transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear; }
+    .hv-ghost:hover { background: #D7D4CB; border-color: #7F7C72; color: #26251F; }
+    .hv-bright:hover { background: #17409F; }
+    .hv-card:hover { border-color: #7F7C72; background: #EFEDE8; }
+    .hv-chip:hover { background: #D7D4CB; border-color: #7F7C72; }
+    .hv-icon:hover { background: #D7D4CB; border-color: #7F7C72; color: #26251F; }
+    .hv-quiet:hover { color: #26251F; }
+    input::placeholder { color: #A5A196; }
+    input:focus { outline: none; border-color: #7F7C72; }
+  </style>
+</helmet>
+
+<div style="min-height: 700px; background: #E4E2DC; color: #26251F;">
+
+  <!-- header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px; height: 56px; border-bottom: 1px solid #C3BFB4; background: #DEDBD3;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.06em; text-transform: lowercase;">swallow</span>
+      <span style="font-size: 11px; color: #8A877D; letter-spacing: 0.02em;">stop choosing</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #B33124; letter-spacing: -0.01em;">
+        Time you've spent deliberating : <span style="font-weight: 500;">{{minutes}}</span> {{label}}
+      </div>
+      <span style="width: 1px; height: 18px; background: #C3BFB4;"></span>
+      <span style="font-size: 12px; color: #8A877D;">mark@swallow.tv</span>
+      <button class="hv hv-ghost" style="font-family: inherit; font-size: 12px; color: #5C5A52; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 5px 11px; cursor: pointer;">Sign out</button>
+    </div>
+  </div>
+
+  <div style="padding: 32px 40px 48px;">
+
+    <!-- search + add -->
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 36px;">
+      <div style="display: flex; align-items: center; gap: 8px; border: 1px solid #C3BFB4; background: #EDEBE6; padding: 0 11px; height: 34px; width: 300px;">
+        <span style="color: #A5A196; display: flex;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 L14 14"/></svg></span>
+        <input placeholder="Search your shows" style="font-family: inherit; font-size: 13px; color: #26251F; border: none; background: transparent; width: 100%; padding: 0;">
+      </div>
+      <button class="hv hv-icon" title="Add a show" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid #C3BFB4; background: #EDEBE6; color: #5C5A52; border-radius: 0; cursor: pointer;">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>
+      </button>
+    </div>
+
+    <!-- the two actions -->
+    <div style="display: flex; gap: 12px; margin-bottom: 40px;">
+      <button class="hv hv-bright" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: inherit; font-size: 19px; font-weight: 600; letter-spacing: 0.01em; color: #FFFFFF; background: #2050C8; border: 1px solid #2050C8; border-radius: 0; padding: 30px 0; cursor: pointer;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="15" height="15"/><circle cx="6.8" cy="6.8" r="1.15" fill="currentColor" stroke="none"/><circle cx="10" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="13.2" cy="13.2" r="1.15" fill="currentColor" stroke="none"/></svg>
+        Random
+      </button>
+      <button class="hv hv-ghost" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: inherit; font-size: 19px; font-weight: 500; color: #4A483F; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 30px 0; cursor: pointer;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 6.5h8M15.5 6.5h1.5M3 13.5h2.5M9.5 13.5h7.5"/><circle cx="13" cy="6.5" r="2"/><circle cx="7.5" cy="13.5" r="2"/></svg>
+        Controlled random
+      </button>
+    </div>
+
+    <!-- saved presets -->
+    <div style="margin-bottom: 40px;">
+      <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8A877D; margin-bottom: 12px;">Saved controlled randoms</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <button class="hv hv-chip" style="display: flex; align-items: baseline; gap: 9px; font-family: inherit; font-size: 13px; color: #4A483F; background: #EDEBE6; border: 1px solid #C3BFB4; border-radius: 0; padding: 8px 13px; cursor: pointer;">
+          Half-hour comfort <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D;">&le;30m</span>
+        </button>
+        <button class="hv hv-chip" style="display: flex; align-items: baseline; gap: 9px; font-family: inherit; font-size: 13px; color: #4A483F; background: #EDEBE6; border: 1px solid #C3BFB4; border-radius: 0; padding: 8px 13px; cursor: pointer;">
+          Late seasons only <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D;">any</span>
+        </button>
+        <button class="hv hv-chip" style="display: flex; align-items: baseline; gap: 9px; font-family: inherit; font-size: 13px; color: #4A483F; background: #EDEBE6; border: 1px solid #C3BFB4; border-radius: 0; padding: 8px 13px; cursor: pointer;">
+          Under twenty <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D;">&le;20m</span>
+        </button>
+        <button class="hv hv-chip" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: 1px dashed #C3BFB4; border-radius: 0; padding: 8px 13px; cursor: pointer;">New&hellip;</button>
+      </div>
+    </div>
+
+    <!-- cards -->
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+        <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8A877D;">Pick one, or don't</div>
+        <button class="hv hv-quiet" style="display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: 12px; color: #8A877D; background: transparent; border: none; padding: 0; cursor: pointer;">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M13.6 8a5.6 5.6 0 1 1-1.7-4"/><path d="M13.9 2.4v3.3h-3.3"/></svg>
+          Shuffle
+        </button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
+
+        <button class="hv hv-card" style="display: flex; flex-direction: column; gap: 0; text-align: left; font-family: inherit; background: #E9E7E1; border: 1px solid #C3BFB4; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #D5D1C7;">
+            <span style="display: block; font-size: 16px; font-weight: 500; line-height: 1.25; color: #26251F;">The Office</span>
+            <span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: #8A877D;">S1&ndash;9</span>
+          </span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8A877D;">142 / 188 left</span>
+        </button>
+
+        <button class="hv hv-card" style="display: flex; flex-direction: column; gap: 0; text-align: left; font-family: inherit; background: #E9E7E1; border: 1px solid #C3BFB4; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #D5D1C7;">
+            <span style="display: block; font-size: 16px; font-weight: 500; line-height: 1.25; color: #26251F;">Seinfeld</span>
+            <span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: #8A877D;">S3&ndash;7</span>
+          </span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8A877D;">88 / 112 left</span>
+        </button>
+
+        <button class="hv hv-card" style="display: flex; flex-direction: column; gap: 0; text-align: left; font-family: inherit; background: #E9E7E1; border: 1px solid #C3BFB4; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #D5D1C7;">
+            <span style="display: block; font-size: 16px; font-weight: 500; line-height: 1.25; color: #26251F;">Frasier</span>
+            <span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: #8A877D;">S1&ndash;11</span>
+          </span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8A877D;">201 / 264 left</span>
+        </button>
+
+        <button class="hv hv-card" style="display: flex; flex-direction: column; gap: 0; text-align: left; font-family: inherit; background: #E9E7E1; border: 1px solid #C3BFB4; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #D5D1C7;">
+            <span style="display: block; font-size: 16px; font-weight: 500; line-height: 1.25; color: #26251F;">Taskmaster</span>
+            <span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: #8A877D;">S6&ndash;16</span>
+          </span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8A877D;">47 / 60 left</span>
+        </button>
+
+        <button class="hv hv-card" style="display: flex; flex-direction: column; gap: 0; text-align: left; font-family: inherit; background: #E9E7E1; border: 1px solid #C3BFB4; border-radius: 0; padding: 0; cursor: pointer;">
+          <span style="display: block; padding: 18px 14px 20px; border-bottom: 1px solid #D5D1C7;">
+            <span style="display: block; font-size: 16px; font-weight: 500; line-height: 1.25; color: #26251F;">Bob's Burgers</span>
+            <span style="display: block; margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: #8A877D;">S4&ndash;9</span>
+          </span>
+          <span style="display: block; padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8A877D;">63 / 132 left</span>
+        </button>
+
+      </div>
+      <div style="margin-top: 11px; font-size: 11px; color: #A5A196;">Five of eleven shows. Fewer options, faster decisions.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"minutes":{"editor":"int","default":3,"min":0,"max":240,"unit":"min","section":"Timer"},"$preview":{"width":1280,"height":700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { seconds: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ seconds: this.state.seconds + 1 }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const minutes = (this.props.minutes ?? 3) + Math.floor(this.state.seconds / 60);
+    return { minutes, label: minutes === 1 ? 'minute' : 'minutes' };
+  }
+}
+</script>
+</body>
+</html>

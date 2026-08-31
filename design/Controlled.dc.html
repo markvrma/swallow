@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #4A483F; text-decoration: none; }
+    a:hover { color: #26251F; text-decoration: underline; }
+    .hv { transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear; }
+    .hv-ghost:hover { background: #D7D4CB; border-color: #7F7C72; color: #26251F; }
+    .hv-solid:hover { background: #3A382F; }
+    .hv-seg:hover { border-color: #7F7C72; color: #26251F; }
+    .hv-row:hover { border-color: #A9A498; }
+    input:focus { outline: none; border-color: #7F7C72; }
+    input::placeholder { color: #A5A196; }
+  </style>
+</helmet>
+
+<div style="min-height: 830px; background: #E4E2DC; color: #26251F;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px; height: 56px; border-bottom: 1px solid #C3BFB4; background: #DEDBD3;">
+    <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.06em;">swallow</span>
+    <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #B33124; letter-spacing: -0.01em;">
+      Time you've spent deliberating : <span style="font-weight: 500;">{{minutes}}</span> {{label}}
+    </div>
+  </div>
+
+  <div style="padding: 34px 40px 48px; max-width: 860px;">
+
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 30px;">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em;">Controlled random</h1>
+      <a href="#" style="font-size: 12px; color: #8A877D;">Back</a>
+    </div>
+
+    <!-- name -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8A877D; margin-bottom: 9px;">Name</div>
+      <input value="Half-hour comfort" style="font-family: inherit; font-size: 14px; color: #26251F; background: #EDEBE6; border: 1px solid #C3BFB4; border-radius: 0; padding: 9px 12px; width: 340px;">
+    </div>
+
+    <!-- length -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8A877D; margin-bottom: 9px;">Episode length</div>
+      <div style="display: flex; gap: 0; border: 1px solid #C3BFB4; width: fit-content; background: #EDEBE6;">
+        <button class="hv hv-seg" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: none; border-right: 1px solid #C3BFB4; padding: 9px 16px; cursor: pointer;">Any</button>
+        <button class="hv hv-seg" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: none; border-right: 1px solid #C3BFB4; padding: 9px 16px; cursor: pointer;">&le; 15</button>
+        <button class="hv hv-seg" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: none; border-right: 1px solid #C3BFB4; padding: 9px 16px; cursor: pointer;">&le; 20</button>
+        <button style="font-family: inherit; font-size: 13px; font-weight: 500; color: #EDEBE6; background: #4A483F; border: none; border-right: 1px solid #4A483F; padding: 9px 16px; cursor: pointer;">&le; 30</button>
+        <button class="hv hv-seg" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: none; border-right: 1px solid #C3BFB4; padding: 9px 16px; cursor: pointer;">&le; 45</button>
+        <button class="hv hv-seg" style="font-family: inherit; font-size: 13px; color: #8A877D; background: transparent; border: none; padding: 9px 16px; cursor: pointer;">&le; 60</button>
+      </div>
+      <div style="margin-top: 8px; font-size: 11px; color: #A5A196;">Minutes, inclusive. A 30-minute sitcom counts as &ldquo;&le; 30&rdquo;.</div>
+    </div>
+
+    <!-- shows -->
+    <div style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px;">
+        <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8A877D;">Shows &amp; seasons</span>
+        <span style="font-size: 11px; color: #A5A196;">a selected show needs at least one season</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+
+        <div class="hv hv-row" style="border: 1px solid #A9A498; background: #EDEBE6; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <span style="width: 14px; height: 14px; border: 1px solid #4A483F; background: #4A483F; display: flex; align-items: center; justify-content: center;">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#EDEBE6" stroke-width="1.8"><path d="M2.5 6.2 4.8 8.5 9.5 3.8"/></svg>
+            </span>
+            <span style="font-size: 14px; font-weight: 500;">The Office</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A5A196;">you own S1&ndash;9</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; padding-left: 25px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S1</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S2</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S3</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S4</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S5</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S6</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S7</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S8</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S9</span>
+          </div>
+        </div>
+
+        <div class="hv hv-row" style="border: 1px solid #A9A498; background: #EDEBE6; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <span style="width: 14px; height: 14px; border: 1px solid #4A483F; background: #4A483F; display: flex; align-items: center; justify-content: center;">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#EDEBE6" stroke-width="1.8"><path d="M2.5 6.2 4.8 8.5 9.5 3.8"/></svg>
+            </span>
+            <span style="font-size: 14px; font-weight: 500;">Bob's Burgers</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A5A196;">you own S4&ndash;9</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; padding-left: 25px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S4</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; padding: 4px 9px;">S5</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S6</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S7</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S8</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8A877D; border: 1px solid #C3BFB4; padding: 4px 9px;">S9</span>
+          </div>
+        </div>
+
+        <div class="hv hv-row" style="border: 1px solid #C3BFB4; background: transparent; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <span style="width: 14px; height: 14px; border: 1px solid #A9A498; background: #EDEBE6;"></span>
+            <span style="font-size: 14px; color: #5C5A52;">Seinfeld</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A5A196;">you own S3&ndash;7</span>
+          </div>
+        </div>
+
+        <div class="hv hv-row" style="border: 1px solid #C3BFB4; background: transparent; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <span style="width: 14px; height: 14px; border: 1px solid #A9A498; background: #EDEBE6;"></span>
+            <span style="font-size: 14px; color: #5C5A52;">Frasier</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A5A196;">you own S1&ndash;11</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding-top: 22px; border-top: 1px solid #C3BFB4;">
+      <button class="hv hv-solid" style="font-family: inherit; font-size: 14px; font-weight: 500; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; border-radius: 0; padding: 12px 24px; cursor: pointer;">Save and roll</button>
+      <button class="hv hv-ghost" style="font-family: inherit; font-size: 13px; color: #5C5A52; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 12px 20px; cursor: pointer;">Cancel</button>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8A877D;">96 episodes match &middot; 71 unseen</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"minutes":{"editor":"int","default":6,"min":0,"max":240,"unit":"min","section":"Timer"},"$preview":{"width":1280,"height":830}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { seconds: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ seconds: this.state.seconds + 1 }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const minutes = (this.props.minutes ?? 6) + Math.floor(this.state.seconds / 60);
+    return { minutes, label: minutes === 1 ? 'minute' : 'minutes' };
+  }
+}
+</script>
+</body>
+</html>

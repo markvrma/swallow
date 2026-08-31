@@ -1,0 +1,85 @@
+{
+  "artboards": [
+    {
+      "file": "Landing.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 820,
+      "title": "1 \u00b7 Landing (signed out)"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 1360,
+      "y": 0,
+      "w": 1280,
+      "h": 700,
+      "title": "2 \u00b7 Home"
+    },
+    {
+      "file": "Episode.dc.html",
+      "x": 2720,
+      "y": 0,
+      "w": 1280,
+      "h": 660,
+      "title": "3 \u00b7 Your episode"
+    },
+    {
+      "file": "Controlled.dc.html",
+      "x": 0,
+      "y": 960,
+      "w": 1280,
+      "h": 830,
+      "title": "4 \u00b7 Controlled random"
+    },
+    {
+      "file": "System.dc.html",
+      "x": 1360,
+      "y": 960,
+      "w": 940,
+      "h": 640,
+      "title": "5 \u00b7 Palette & states"
+    },
+    {
+      "file": "AltDark.dc.html",
+      "x": 2380,
+      "y": 960,
+      "w": 1280,
+      "h": 700,
+      "title": "Alternate \u00b7 same system, dark"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "premise",
+      "x": 0,
+      "y": -190,
+      "w": 620,
+      "text": "Drab by default, bright once.\n\nEverything is warm grey, zero radius, hairline borders. The only saturated colour in the product is the Random button \u2014 so the eye lands on the one control that ends the deliberation. Hover shifts one step darker over 110ms: no lift, no shadow, no scale."
+    },
+    {
+      "id": "timer-note",
+      "x": 1360,
+      "y": -190,
+      "w": 560,
+      "text": "The red timer sits top-right on every screen.\n\n\"Time you've spent deliberating : x minutes\" \u2014 counts from page load, ticks by itself, resets only on refresh. It is live on these artboards, so leave one open a minute and watch it move."
+    },
+    {
+      "id": "alt-note",
+      "x": 2380,
+      "y": 800,
+      "w": 520,
+      "text": "Alternate, not a second direction: identical system, dark ground. Worth a look since this app gets used at night. Say the word and it becomes the default."
+    },
+    {
+      "id": "open-q",
+      "x": 660,
+      "y": -190,
+      "w": 560,
+      "text": "One thing to confirm: you said the Random button should be bright \"on the login\". I read that as Random being the single bright element wherever it appears, landing screen included. If you meant bright ONLY on the signed-out screen and drab on Home, that's a one-line change."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

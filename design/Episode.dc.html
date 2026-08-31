@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #4A483F; text-decoration: none; }
+    a:hover { color: #26251F; text-decoration: underline; }
+    .hv { transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear; }
+    .hv-ghost:hover { background: #D7D4CB; border-color: #7F7C72; color: #26251F; }
+    .hv-solid:hover { background: #3A382F; }
+    .hv-quiet:hover { color: #26251F; }
+  </style>
+</helmet>
+
+<div style="min-height: 660px; background: #E4E2DC; color: #26251F;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px; height: 56px; border-bottom: 1px solid #C3BFB4; background: #DEDBD3;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.06em;">swallow</span>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #B33124; letter-spacing: -0.01em;">
+      Time you've spent deliberating : <span style="font-weight: 500;">{{minutes}}</span> {{label}}
+    </div>
+  </div>
+
+  <div style="padding: 44px 40px;">
+    <div style="max-width: 720px;">
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A877D; margin-bottom: 14px;">Frasier &middot; S04E18</div>
+
+      <h1 style="margin: 0; font-size: 32px; font-weight: 500; line-height: 1.2; letter-spacing: -0.015em; text-wrap: pretty;">Ham Radio</h1>
+
+      <div style="display: flex; align-items: center; gap: 14px; margin-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8A877D;">
+        <span>22 min</span><span style="color: #C3BFB4;">/</span><span>4 May 1997</span>
+      </div>
+
+      <p style="margin: 26px 0 0; font-size: 15px; line-height: 1.75; color: #4A483F; max-width: 62ch; text-wrap: pretty;">
+        Frasier commandeers the station's radio play and drives the entire staff to mutiny with
+        his direction. Niles takes on eleven roles, Bulldog rewrites his own lines, and the
+        broadcast collapses live on air.
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px;">
+        <button class="hv hv-solid" style="display: flex; align-items: center; gap: 10px; font-family: inherit; font-size: 14px; font-weight: 500; color: #EDEBE6; background: #4A483F; border: 1px solid #4A483F; border-radius: 0; padding: 12px 20px; cursor: pointer;">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="15" height="15"/><circle cx="6.8" cy="6.8" r="1.15" fill="currentColor" stroke="none"/><circle cx="10" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="13.2" cy="13.2" r="1.15" fill="currentColor" stroke="none"/></svg>
+          Roll again
+        </button>
+        <button class="hv hv-ghost" style="font-family: inherit; font-size: 14px; color: #4A483F; background: transparent; border: 1px solid #C3BFB4; border-radius: 0; padding: 12px 20px; cursor: pointer;">Not tonight, put it back</button>
+      </div>
+
+      <div style="display: flex; gap: 22px; margin-top: 30px; padding-top: 22px; border-top: 1px solid #C3BFB4; font-size: 12px;">
+        <a href="#">Where to stream</a>
+        <a href="#">TVmaze</a>
+        <a href="#">IMDb</a>
+      </div>
+
+      <div style="margin-top: 40px; border: 1px solid #C3BFB4; border-left: 3px solid #B33124; background: #EAE8E2; padding: 14px 18px;">
+        <div style="font-size: 12px; line-height: 1.6; color: #5C5A52;">
+          <span style="color: #B33124; font-weight: 500;">You'd seen everything in this pool.</span>
+          History cleared &mdash; every episode is back in the draw.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"minutes":{"editor":"int","default":4,"min":0,"max":240,"unit":"min","section":"Timer"},"$preview":{"width":1280,"height":660}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { seconds: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ seconds: this.state.seconds + 1 }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const minutes = (this.props.minutes ?? 4) + Math.floor(this.state.seconds / 60);
+    return { minutes, label: minutes === 1 ? 'minute' : 'minutes' };
+  }
+}
+</script>
+</body>
+</html>
