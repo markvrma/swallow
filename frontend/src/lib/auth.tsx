@@ -40,7 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await api.logout()
-    queryClient.clear()
+    // resetQueries (not clear) so the mounted 'me' observer refetches and the UI flips.
+    await queryClient.resetQueries()
   }
 
   return (

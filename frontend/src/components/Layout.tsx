@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user, signOut, refresh } = useAuth()
+  const { user, signOut } = useAuth()
 
   return (
     <div className="mx-auto min-h-screen max-w-5xl px-4 pb-16">
@@ -17,10 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3 text-sm text-zinc-400">
             <span className="hidden sm:inline">{user.email}</span>
             <button
-              onClick={async () => {
-                await signOut()
-                await refresh()
-              }}
+              onClick={() => signOut()}
               className="rounded-md border border-zinc-700 px-3 py-1 hover:bg-zinc-800"
             >
               Sign out
