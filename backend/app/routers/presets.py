@@ -36,7 +36,7 @@ def _resolve_shows(
     missing = [str(s) for s in show_ids if s not in owned]
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Shows not in your library: {missing}",
         )
 
@@ -52,7 +52,7 @@ def _resolve_shows(
         unknown = [s for s in wanted if s not in known.get(item.show_id, set())]
         if unknown:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Show {item.show_id} has no season(s) {unknown}",
             )
         resolved[item.show_id] = wanted
@@ -124,7 +124,7 @@ def create_preset(payload: PresetWriteRequest, user: CurrentUser, db: DbSession)
         db.execute(delete(Preset).where(Preset.id == preset.id))
         db.commit()
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="No episodes match this configuration",
         )
     return _preset_out(db, user.id, preset)
@@ -156,7 +156,7 @@ def update_preset(
     db.refresh(preset)
     if count_pool(db, build_preset_pool(db, user.id, preset.id)) == 0:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="No episodes match this configuration",
         )
     return _preset_out(db, user.id, preset)

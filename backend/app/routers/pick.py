@@ -27,14 +27,14 @@ def pick_episode(payload: PickRequest, user: CurrentUser, db: DbSession):
         elif payload.mode == "show":
             if payload.show_id is None:
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail="show_id is required for mode 'show'",
                 )
             pool = build_show_pool(db, user.id, payload.show_id)
         else:
             if payload.preset_id is None:
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail="preset_id is required for mode 'preset'",
                 )
             pool = build_preset_pool(db, user.id, payload.preset_id)

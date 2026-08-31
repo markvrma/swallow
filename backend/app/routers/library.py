@@ -37,7 +37,7 @@ def _validate_seasons(db: Session, show: Show, seasons: list[int]) -> list[int]:
     unknown = [s for s in wanted if s not in known]
     if unknown:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"{show.name} has no season(s) {unknown}",
         )
     return wanted
