@@ -1,9 +1,10 @@
 import hashlib
 import secrets
 from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
+from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from fastapi import Depends, HTTPException, Request, Response, status
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -60,7 +61,7 @@ def destroy_session(db: Session, request: Request, response: Response) -> None:
 
 
 def get_current_user_optional(
-    request: Request, db: Session = Depends(get_db)
+    request: Request, db: Annotated[Session, Depends(get_db)]
 ) -> User | None:
     token = request.cookies.get(_settings.session_cookie_name)
     if not token:
@@ -82,7 +83,9 @@ def get_current_user_optional(
     return user
 
 
-def get_current_user(user: User | None = Depends(get_current_user_optional)) -> User:
+def get_current_user(
+    user: Annotated[User | None, Depends(get_current_user_optional)],
+) -> User:
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
