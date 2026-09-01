@@ -1,0 +1,38 @@
+# fly launch --no-deploy generates this; the values below are the ones that matter.
+# Set the region to whichever one your Supabase project lives in -- every request
+# runs several queries, so a cross-continent hop is felt.
+app = "swallow-api"
+primary_region = "iad"
+
+[build]
+
+[deploy]
+  # Runs in a one-off machine before the new version takes traffic, so the schema
+  # is never behind the code that expects it.
+  release_command = "alembic upgrade head"
+
+[env]
+  # The SPA and the API are same-origin through Vercel's rewrite, so CORS never
+  # comes into play. Leave it empty rather than listing an origin that is unused.
+  CORS_ORIGINS = ""
+  COOKIE_SECURE = "true"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_start_machines = true
+  # Suspend rather than stop, and keep one machine up: a cold start on "hand me an
+  # episode" is the whole product feeling broken.
+  auto_stop_machines = "suspend"
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
