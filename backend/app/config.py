@@ -16,6 +16,21 @@ class Settings(BaseSettings):
     # Set to True when serving over HTTPS.
     cookie_secure: bool = False
 
+    # --- signup email verification ---
+    otp_ttl_minutes: int = 10
+    otp_max_attempts: int = 5
+    otp_resend_interval_seconds: int = 60
+
+    # SMTP. With no host configured the code is logged instead of sent, which is
+    # what you want in development and never what you want in production.
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_starttls: bool = True
+    smtp_from: str = "Swallow <no-reply@swallow.local>"
+    smtp_timeout_seconds: float = 15.0
+
     tvmaze_base_url: str = "https://api.tvmaze.com"
     tvmaze_timeout_seconds: float = 15.0
 

@@ -2,6 +2,12 @@ export interface User {
   id: string
   email: string
   created_at: string
+  email_verified_at: string | null
+}
+
+export interface PendingVerification {
+  email: string
+  verification_required: boolean
 }
 
 export interface Show {

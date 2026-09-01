@@ -1,5 +1,6 @@
 import type {
   EpisodeWithShow,
+  PendingVerification,
   LibraryShow,
   PickMode,
   PickResponse,
@@ -42,8 +43,21 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 // --- auth ---
 
+/** Creates the account and mails a code. There is no session until /verify. */
 export const register = (email: string, password: string) =>
-  request<User>('/api/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) })
+  request<PendingVerification>('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  })
+
+export const verifyEmail = (email: string, code: string) =>
+  request<User>('/api/auth/verify', { method: 'POST', body: JSON.stringify({ email, code }) })
+
+export const resendCode = (email: string) =>
+  request<{ sent: boolean }>('/api/auth/resend', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
 
 export const login = (email: string, password: string) =>
   request<User>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })

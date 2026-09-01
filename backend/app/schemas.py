@@ -31,10 +31,27 @@ class LoginRequest(BaseModel):
     password: str = Field(max_length=200)
 
 
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
+class ResendCodeRequest(BaseModel):
+    email: EmailStr
+
+
+class PendingVerificationOut(BaseModel):
+    """Returned by register: the account exists but cannot sign in yet."""
+
+    email: str
+    verification_required: bool = True
+
+
 class UserOut(ORMModel):
     id: uuid.UUID
     email: str
     created_at: datetime
+    email_verified_at: datetime | None = None
 
 
 # --- catalogue --------------------------------------------------------------

@@ -1,6 +1,7 @@
 import os
 import uuid
 from collections.abc import Iterator
+from datetime import UTC, datetime
 
 TEST_DB_URL = os.environ.setdefault(
     "DATABASE_URL", "postgresql+psycopg://postgres@127.0.0.1:5433/swallow_test"
@@ -64,8 +65,23 @@ def client(db: Session) -> Iterator[TestClient]:
 
 
 @pytest.fixture
+def sent_codes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
+    """Capture verification codes instead of mailing them."""
+    box: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        "app.routers.auth.send_verification_code",
+        lambda to_email, code: box.append((to_email, code)),
+    )
+    return box
+
+
+@pytest.fixture
 def user(db: Session) -> User:
-    u = User(email="viewer@example.com", password_hash=hash_password("hunter2hunter2"))
+    u = User(
+        email="viewer@example.com",
+        password_hash=hash_password("hunter2hunter2"),
+        email_verified_at=datetime.now(UTC),
+    )
     db.add(u)
     db.commit()
     db.refresh(u)
@@ -121,6 +137,21 @@ def add_to_library(db: Session, user: User, show: Show, seasons: list[int]) -> U
     db.commit()
     db.refresh(row)
     return row
+
+
+def make_verified_user(
+    db: Session, email: str, password: str = "hunter2hunter2"
+) -> User:
+    """A second account that skips the signup code -- verification has its own tests."""
+    u = User(
+        email=email,
+        password_hash=hash_password(password),
+        email_verified_at=datetime.now(UTC),
+    )
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    return u
 
 
 def register(client: TestClient, email: str = "new@example.com", password: str = "hunter2hunter2"):
