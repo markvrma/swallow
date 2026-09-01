@@ -1,9 +1,95 @@
 @import "tailwindcss";
 
+/* Quiet UI: drab warm-grey ground, zero corner radius, hairline borders, and
+   exactly one saturated colour in the product (Random) plus one red (the timer). */
+:root {
+  --ground: #e4e2dc;
+  --bar: #dedbd3;
+  --raised: #edebe6;
+  --card: #e9e7e1;
+  --line: #c3bfb4;
+  --line-soft: #d5d1c7;
+  --muted: #8a877d;
+  --faint: #a5a196;
+  --ink: #26251f;
+  --ink-2: #4a483f;
+  --ink-3: #5c5a52;
+  --on-solid: #edebe6;
+  --bright: #5b2fc9;
+  --bright-hover: #46219f;
+  --timer: #b33124;
+  --hover-ground: #d7d4cb;
+  --hover-line: #7f7c72;
+  --hover-card: #efede8;
+  --hover-solid: #3a382f;
+  --braille: #26251f;
+  --scrim: rgb(38 37 31 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #1b1b18;
+    --bar: #201f1c;
+    --raised: #232320;
+    --card: #201f1c;
+    --line: #33322c;
+    --line-soft: #2b2a25;
+    --muted: #6e6b62;
+    --faint: #605d55;
+    --ink: #d8d5cc;
+    --ink-2: #9a968b;
+    --ink-3: #9a968b;
+    --on-solid: #1b1b18;
+    --bright: #8a63e8;
+    --bright-hover: #7450d0;
+    --timer: #d9584a;
+    --hover-ground: #2a2a26;
+    --hover-line: #55534b;
+    --hover-card: #232320;
+    --hover-solid: #c4c0b6;
+    --braille: #d8d5cc;
+    --scrim: rgb(0 0 0 / 0.7);
+  }
+}
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  /* Locally installed nerd font if present, otherwise the mono stack. */
+  --font-nerd: "JetBrainsMono Nerd Font", "JetBrainsMono NF", "Symbols Nerd Font",
+    "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-ground: var(--ground);
+  --color-bar: var(--bar);
+  --color-raised: var(--raised);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-on-solid: var(--on-solid);
+  --color-bright: var(--bright);
+  --color-bright-hover: var(--bright-hover);
+  --color-timer: var(--timer);
+  --color-hover-ground: var(--hover-ground);
+  --color-hover-line: var(--hover-line);
+  --color-hover-card: var(--hover-card);
+  --color-hover-solid: var(--hover-solid);
+  --color-scrim: var(--scrim);
 }
 
 body {
-  @apply bg-zinc-950 text-zinc-100 antialiased;
+  @apply bg-ground text-ink antialiased;
+}
+
+/* One step darker over 110ms. No lift, no shadow, no scale — movement is stimulation. */
+* {
+  transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear;
+}
+
+::placeholder {
+  color: var(--faint);
 }

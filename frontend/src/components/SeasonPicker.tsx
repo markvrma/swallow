@@ -23,16 +23,16 @@ export default function SeasonPicker({ seasons, selected, onChange }: Props) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-medium text-zinc-300">Seasons</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Seasons</span>
         <div className="flex gap-2 text-xs">
           <button
             type="button"
             onClick={() => onChange(regular.map((s) => s.number))}
-            className="text-amber-400 hover:underline"
+            className="text-muted hover:text-ink"
           >
             All
           </button>
-          <button type="button" onClick={() => onChange([])} className="text-zinc-500 hover:underline">
+          <button type="button" onClick={() => onChange([])} className="text-muted hover:text-ink">
             None
           </button>
         </div>
@@ -44,14 +44,14 @@ export default function SeasonPicker({ seasons, selected, onChange }: Props) {
             type="button"
             onClick={() => toggle(season.number)}
             title={`${season.episode_count} episodes`}
-            className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+            className={`border px-2.5 py-1 font-mono text-[11px] ${
               selected.includes(season.number)
-                ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                ? 'border-ink-2 bg-ink-2 text-on-solid'
+                : 'border-line text-muted hover:border-hover-line hover:text-ink'
             }`}
           >
             S{season.number}
-            <span className="ml-1 text-xs opacity-60">·{season.episode_count}</span>
+            <span className="ml-1 opacity-60">·{season.episode_count}</span>
           </button>
         ))}
         {specials && (
@@ -59,19 +59,19 @@ export default function SeasonPicker({ seasons, selected, onChange }: Props) {
             type="button"
             onClick={() => toggle(0)}
             title={`${specials.episode_count} specials`}
-            className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+            className={`border px-2.5 py-1 font-mono text-[11px] ${
               selected.includes(0)
-                ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                : 'border-dashed border-zinc-700 text-zinc-500 hover:border-zinc-500'
+                ? 'border-ink-2 bg-ink-2 text-on-solid'
+                : 'border-dashed border-line text-muted hover:border-hover-line hover:text-ink'
             }`}
           >
             Specials
-            <span className="ml-1 text-xs opacity-60">·{specials.episode_count}</span>
+            <span className="ml-1 opacity-60">·{specials.episode_count}</span>
           </button>
         )}
       </div>
       {selected.length === 0 && (
-        <p className="mt-2 text-xs text-amber-400/80">Select at least one season.</p>
+        <p className="mt-2 text-[11px] text-timer">Select at least one season.</p>
       )}
     </div>
   )

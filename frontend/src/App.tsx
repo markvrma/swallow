@@ -4,13 +4,11 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ControlledRandom from './pages/ControlledRandom'
-import Roll from './pages/Roll'
-import EpisodePage from './pages/Episode'
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center text-zinc-500">…</div>
+    return <div className="flex min-h-screen items-center justify-center bg-ground font-mono text-xs text-muted">…</div>
   }
   if (!user) return <Navigate to="/login" replace />
   return <>{children}</>
@@ -27,22 +25,6 @@ export default function App() {
         element={
           <Protected>
             <ControlledRandom />
-          </Protected>
-        }
-      />
-      <Route
-        path="/roll"
-        element={
-          <Protected>
-            <Roll />
-          </Protected>
-        }
-      />
-      <Route
-        path="/episode/:episodeId"
-        element={
-          <Protected>
-            <EpisodePage />
           </Protected>
         }
       />
