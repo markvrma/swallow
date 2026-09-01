@@ -6,18 +6,18 @@ import type { Preset } from '../api/types'
 import { RUNTIME_BUCKETS } from '../api/types'
 import Layout from '../components/Layout'
 import { formatSeasons } from '../lib/format'
+import { useRoll } from '../lib/useRoll'
 
 interface DraftShow {
   showId: string
   seasons: number[]
 }
 
-function openRoll(presetId: string) {
-  window.open(`/roll?mode=preset&presetId=${presetId}`, '_blank', 'noopener')
-}
+const LABEL = 'text-[10px] font-semibold uppercase tracking-[0.12em] text-muted'
 
 export default function ControlledRandom() {
   const queryClient = useQueryClient()
+  const { roll, box } = useRoll()
 
   const { data: library } = useQuery({ queryKey: ['library'], queryFn: api.listLibrary })
   const { data: presets } = useQuery({ queryKey: ['presets'], queryFn: api.listPresets })
@@ -85,7 +85,7 @@ export default function ControlledRandom() {
     onSuccess: async (preset) => {
       await queryClient.invalidateQueries({ queryKey: ['presets'] })
       setBuilding(false)
-      openRoll(preset.id)
+      roll({ mode: 'preset', presetId: preset.id })
     },
     onError: (err) => setError(err instanceof Error ? err.message : 'Could not save'),
   })
@@ -119,210 +119,215 @@ export default function ControlledRandom() {
     )
   }
 
+  const segment = (active: boolean) =>
+    active
+      ? 'bg-ink-2 font-medium text-on-solid'
+      : 'text-muted hover:text-ink'
+
   return (
     <Layout>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Controlled random</h1>
-        <Link to="/" className="text-sm text-zinc-400 hover:text-zinc-200">
-          ← Home
-        </Link>
-      </div>
-
-      {!building && (
-        <div className="space-y-6">
-          <button
-            onClick={startNew}
-            className="w-full rounded-xl border-2 border-dashed border-zinc-700 py-6 text-lg font-semibold text-zinc-300 hover:border-amber-400/60"
-          >
-            + New controlled random
-          </button>
-
-          {(presets?.length ?? 0) > 0 && (
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Saved</h2>
-              {presets!.map((preset) => (
-                <div
-                  key={preset.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold">
-                      {preset.name}
-                      {preset.max_runtime && (
-                        <span className="ml-2 rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
-                          ≤ {preset.max_runtime} min
-                        </span>
-                      )}
-                    </p>
-                    <p className="mt-1 truncate text-xs text-zinc-500">
-                      {preset.shows.map((ps) => `${ps.show.name} ${formatSeasons(ps.seasons)}`).join(' · ')}
-                    </p>
-                    <p className="mt-1 text-xs text-zinc-600">
-                      {preset.remaining_count}/{preset.episode_count} episodes unseen
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button
-                      onClick={() => openRoll(preset.id)}
-                      className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300"
-                    >
-                      🎲 Roll
-                    </button>
-                    <button
-                      onClick={() => startEdit(preset)}
-                      className="rounded-lg border border-zinc-700 px-3 py-2 text-sm hover:bg-zinc-800"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteMutation.mutate(preset.id)}
-                      className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-red-400 hover:bg-zinc-800"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </section>
-          )}
+      <div className="max-w-[860px]">
+        <div className="mb-7 flex items-baseline justify-between">
+          <h1 className="text-[22px] font-medium tracking-[-0.01em]">Controlled random</h1>
+          <Link to="/" className="text-xs text-muted hover:text-ink">
+            Back
+          </Link>
         </div>
-      )}
 
-      {building && (
-        <div className="space-y-8">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-zinc-300">Name</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Comfort comedies, short ones"
-              className="w-full max-w-md rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2.5 outline-none focus:border-amber-400"
-            />
-          </div>
+        {!building && (
+          <div className="space-y-7">
+            <button
+              onClick={startNew}
+              className="w-full border border-dashed border-line py-6 text-sm font-medium text-muted hover:border-hover-line hover:bg-hover-ground hover:text-ink"
+            >
+              New controlled random
+            </button>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-zinc-300">
-              Episode length
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setMaxRuntime(null)}
-                className={`rounded-md border px-3 py-1.5 text-sm ${
-                  maxRuntime === null
-                    ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                }`}
-              >
-                Any
-              </button>
-              {RUNTIME_BUCKETS.map((bucket) => (
-                <button
-                  key={bucket}
-                  onClick={() => setMaxRuntime(bucket)}
-                  className={`rounded-md border px-3 py-1.5 text-sm ${
-                    maxRuntime === bucket
-                      ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  ≤ {bucket} min
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-zinc-300">
-              Shows & seasons
-              <span className="ml-2 font-normal text-zinc-500">
-                selecting a show requires choosing its seasons
-              </span>
-            </label>
-            {(library?.length ?? 0) === 0 && (
-              <p className="text-sm text-zinc-500">
-                Your library is empty —{' '}
-                <Link to="/?add=1" className="text-amber-400 hover:underline">
-                  add a show
-                </Link>{' '}
-                first.
-              </p>
-            )}
-            <div className="space-y-2">
-              {library?.map((item) => {
-                const draft = draftShows.find((d) => d.showId === item.show.id)
-                return (
-                  <div
-                    key={item.show.id}
-                    className={`rounded-xl border p-4 transition-colors ${
-                      draft ? 'border-amber-400/50 bg-zinc-900' : 'border-zinc-800 bg-zinc-900/50'
-                    }`}
-                  >
-                    <label className="flex cursor-pointer items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(draft)}
-                        onChange={() => toggleShow(item.show.id, item.seasons)}
-                        className="h-4 w-4 accent-amber-400"
-                      />
-                      <span className="font-medium">{item.show.name}</span>
-                      <span className="text-xs text-zinc-500">
-                        you own {formatSeasons(item.seasons)}
-                      </span>
-                    </label>
-                    {draft && (
-                      <div className="mt-3 flex flex-wrap gap-2 pl-7">
-                        {item.seasons.map((season) => (
-                          <button
-                            key={season}
-                            onClick={() => toggleSeason(item.show.id, season)}
-                            className={`rounded-md border px-2.5 py-1 text-xs ${
-                              draft.seasons.includes(season)
-                                ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                            }`}
-                          >
-                            {season === 0 ? 'Specials' : `S${season}`}
-                          </button>
-                        ))}
-                        {draft.seasons.length === 0 && (
-                          <span className="text-xs text-amber-400/80">
-                            pick at least one season
+            {(presets?.length ?? 0) > 0 && (
+              <section>
+                <h2 className={`${LABEL} mb-3`}>Saved</h2>
+                <div className="space-y-1.5">
+                  {presets!.map((preset) => (
+                    <div
+                      key={preset.id}
+                      className="flex flex-wrap items-center justify-between gap-3 border border-line bg-raised p-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="flex items-baseline gap-2.5 text-sm font-medium">
+                          {preset.name}
+                          <span className="font-mono text-[11px] text-muted">
+                            {preset.max_runtime ? `≤${preset.max_runtime}m` : 'any'}
                           </span>
-                        )}
+                        </p>
+                        <p className="mt-1 truncate text-[11px] text-faint">
+                          {preset.shows.map((ps) => `${ps.show.name} ${formatSeasons(ps.seasons)}`).join(' · ')}
+                        </p>
+                        <p className="mt-1 font-mono text-[11px] text-muted">
+                          {preset.remaining_count} / {preset.episode_count} unseen
+                        </p>
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {error && <p className="text-sm text-red-400">{error}</p>}
-
-          <div className="flex items-center gap-4">
-            <button
-              disabled={!valid || saveMutation.isPending}
-              onClick={() => saveMutation.mutate()}
-              className="rounded-lg bg-amber-400 px-6 py-2.5 font-semibold text-zinc-950 hover:bg-amber-300 disabled:opacity-40"
-            >
-              {saveMutation.isPending ? 'Saving…' : editing ? 'Save & roll' : 'Save & roll 🎲'}
-            </button>
-            <button
-              onClick={() => setBuilding(false)}
-              className="rounded-lg border border-zinc-700 px-5 py-2.5 text-sm hover:bg-zinc-800"
-            >
-              Cancel
-            </button>
-            {showPreview && (
-              <span className={`text-sm ${preview.episode_count === 0 ? 'text-red-400' : 'text-zinc-400'}`}>
-                {preview.episode_count === 0
-                  ? 'No episodes match this configuration'
-                  : `${preview.episode_count} episodes match · ${preview.remaining_count} unseen`}
-              </span>
+                      <div className="flex shrink-0 gap-2">
+                        <button
+                          onClick={() => roll({ mode: 'preset', presetId: preset.id })}
+                          className="border border-bright bg-bright px-4 py-2 text-xs font-semibold text-white hover:bg-bright-hover"
+                        >
+                          Roll
+                        </button>
+                        <button
+                          onClick={() => startEdit(preset)}
+                          className="border border-line px-3 py-2 text-xs text-ink-2 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteMutation.mutate(preset.id)}
+                          className="border border-line px-3 py-2 text-xs text-timer hover:border-hover-line hover:bg-hover-ground"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </div>
-        </div>
-      )}
+        )}
+
+        {building && (
+          <div>
+            <div className="mb-7">
+              <div className={`${LABEL} mb-2.5`}>Name</div>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Half-hour comfort"
+                className="w-[340px] max-w-full border border-line bg-raised px-3 py-2.5 text-sm text-ink outline-none focus:border-hover-line"
+              />
+            </div>
+
+            <div className="mb-7">
+              <div className={`${LABEL} mb-2.5`}>Episode length</div>
+              <div className="flex w-fit max-w-full flex-wrap border border-line bg-raised">
+                <button
+                  onClick={() => setMaxRuntime(null)}
+                  className={`border-r border-line px-4 py-2.5 text-[13px] ${segment(maxRuntime === null)}`}
+                >
+                  Any
+                </button>
+                {RUNTIME_BUCKETS.map((bucket, index) => (
+                  <button
+                    key={bucket}
+                    onClick={() => setMaxRuntime(bucket)}
+                    className={`px-4 py-2.5 text-[13px] ${
+                      index < RUNTIME_BUCKETS.length - 1 ? 'border-r border-line' : ''
+                    } ${segment(maxRuntime === bucket)}`}
+                  >
+                    ≤ {bucket}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] text-faint">
+                Minutes, inclusive. A 30-minute sitcom counts as “≤ 30”.
+              </p>
+            </div>
+
+            <div className="mb-7">
+              <div className="mb-2.5 flex items-baseline gap-2.5">
+                <span className={LABEL}>Shows &amp; seasons</span>
+                <span className="text-[11px] text-faint">
+                  a selected show needs at least one season
+                </span>
+              </div>
+              {(library?.length ?? 0) === 0 && (
+                <p className="text-sm text-muted">
+                  Your library is empty —{' '}
+                  <Link to="/?add=1" className="text-ink-2 hover:text-ink hover:underline">
+                    add a show
+                  </Link>{' '}
+                  first.
+                </p>
+              )}
+              <div className="space-y-1.5">
+                {library?.map((item) => {
+                  const draft = draftShows.find((d) => d.showId === item.show.id)
+                  return (
+                    <div
+                      key={item.show.id}
+                      className={`border p-4 ${
+                        draft ? 'border-hover-line bg-raised' : 'border-line bg-transparent'
+                      }`}
+                    >
+                      <label className="flex cursor-pointer items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(draft)}
+                          onChange={() => toggleShow(item.show.id, item.seasons)}
+                          className="h-3.5 w-3.5 rounded-none accent-[var(--ink-2)]"
+                        />
+                        <span className={`text-sm ${draft ? 'font-medium text-ink' : 'text-ink-3'}`}>
+                          {item.show.name}
+                        </span>
+                        <span className="font-mono text-[11px] text-faint">
+                          you own {formatSeasons(item.seasons)}
+                        </span>
+                      </label>
+                      {draft && (
+                        <div className="mt-3 flex flex-wrap gap-1.5 pl-[26px]">
+                          {item.seasons.map((season) => (
+                            <button
+                              key={season}
+                              onClick={() => toggleSeason(item.show.id, season)}
+                              className={`border px-2.5 py-1 font-mono text-[11px] ${
+                                draft.seasons.includes(season)
+                                  ? 'border-ink-2 bg-ink-2 text-on-solid'
+                                  : 'border-line text-muted hover:border-hover-line hover:text-ink'
+                              }`}
+                            >
+                              {season === 0 ? 'S0' : `S${season}`}
+                            </button>
+                          ))}
+                          {draft.seasons.length === 0 && (
+                            <span className="self-center text-[11px] text-timer">
+                              pick at least one season
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {error && <p className="mb-4 text-xs text-timer">{error}</p>}
+
+            <div className="flex flex-wrap items-center gap-4 border-t border-line pt-5">
+              <button
+                disabled={!valid || saveMutation.isPending}
+                onClick={() => saveMutation.mutate()}
+                className="border border-ink-2 bg-ink-2 px-6 py-3 text-sm font-medium text-on-solid hover:bg-hover-solid disabled:border-line-soft disabled:bg-transparent disabled:text-faint"
+              >
+                {saveMutation.isPending ? 'Saving…' : 'Save and roll'}
+              </button>
+              <button
+                onClick={() => setBuilding(false)}
+                className="border border-line px-5 py-3 text-[13px] text-ink-3 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
+              >
+                Cancel
+              </button>
+              {showPreview && (
+                <span className={`font-mono text-xs ${preview.episode_count === 0 ? 'text-timer' : 'text-muted'}`}>
+                  {preview.episode_count === 0
+                    ? 'No episodes match this configuration'
+                    : `${preview.episode_count} episodes match · ${preview.remaining_count} unseen`}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      {box}
     </Layout>
   )
 }
