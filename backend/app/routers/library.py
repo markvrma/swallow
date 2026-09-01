@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.deps import CurrentUser, DbSession
-from app.models import Season, Show, UserShow, WatchHistory
+from app.models import Episode, Preset, PresetShow, Season, Show, UserShow, WatchHistory
 from app.providers.tvmaze import ShowNotFound, TVmazeError
 from app.schemas import (
     AddLibraryShowRequest,
@@ -122,6 +122,13 @@ def update_library_show(
 
 @router.delete("/shows/{show_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_library_show(show_id: uuid.UUID, user: CurrentUser, db: DbSession):
+    """Drop a show and every trace of it in this user's data.
+
+    The catalogue rows (shows, seasons, episodes) are shared between users and stay
+    put; what goes is this user's library row, their watch history for the show, and
+    the show's slice of their presets. A preset left with no shows can never roll, so
+    it is deleted rather than left in a state the write endpoints would reject.
+    """
     result = db.execute(
         delete(UserShow).where(UserShow.user_id == user.id, UserShow.show_id == show_id)
     )
@@ -129,6 +136,30 @@ def remove_library_show(show_id: uuid.UUID, user: CurrentUser, db: DbSession):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Show is not in your library"
         )
+
+    db.execute(
+        delete(WatchHistory).where(
+            WatchHistory.user_id == user.id,
+            WatchHistory.episode_id.in_(
+                select(Episode.id).where(Episode.show_id == show_id)
+            ),
+        )
+    )
+
+    user_presets = select(Preset.id).where(Preset.user_id == user.id)
+    db.execute(
+        delete(PresetShow).where(
+            PresetShow.show_id == show_id, PresetShow.preset_id.in_(user_presets)
+        )
+    )
+    db.execute(
+        delete(Preset).where(
+            Preset.user_id == user.id,
+            ~select(PresetShow.id)
+            .where(PresetShow.preset_id == Preset.id)
+            .exists(),
+        )
+    )
     db.commit()
 
 
