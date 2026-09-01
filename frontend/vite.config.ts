@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       // The SPA and the API stay same-origin in dev, so the session cookie just works.
-      '/api': 'http://127.0.0.1:8000',
+      '/api': process.env.API_URL ?? 'http://127.0.0.1:8000',
     },
   },
 })
