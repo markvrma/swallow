@@ -204,7 +204,7 @@ def test_show_not_in_library_raises(db: Session, user: User) -> None:
 
 
 def test_history_is_scoped_per_user(db: Session, user: User) -> None:
-    other = User(email="other@example.com", password_hash="x")
+    other = User(email="other@example.com", clerk_user_id="user_other")
     db.add(other)
     db.commit()
 

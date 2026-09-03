@@ -15,7 +15,9 @@ primary_region = "iad"
   # The SPA and the API are same-origin through Vercel's rewrite, so CORS never
   # comes into play. Leave it empty rather than listing an origin that is unused.
   CORS_ORIGINS = ""
-  COOKIE_SECURE = "true"
+  # Origins allowed to mint tokens for this API (the token's `azp` claim). Set this
+  # to the deployed frontend URL -- an empty list disables the check.
+  CLERK_AUTHORIZED_PARTIES = "https://swallow.vercel.app"
 
 [http_service]
   internal_port = 8080

@@ -1,7 +1,8 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, type ReactNode } from 'react'
+import { useAuth as useClerkAuth, useClerk } from '@clerk/clerk-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as api from '../api/client'
-import { ApiError } from '../api/client'
+import { ApiError, setTokenGetter } from '../api/client'
 import type { User } from '../api/types'
 
 interface AuthState {
@@ -18,11 +19,27 @@ const AuthContext = createContext<AuthState>({
   signOut: async () => {},
 })
 
+/** Bridges Clerk's identity to the local account row.
+ *
+ *  Clerk knows who is signed in; the API still owns the library, presets and
+ *  history, all keyed on a local user id. `/api/auth/me` returns that row and
+ *  creates it on the first authenticated call, so there is no separate signup step.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
+  const { isLoaded, isSignedIn, getToken } = useClerkAuth()
+  const clerk = useClerk()
+
+  // The api client is not a component, so hand it a way to reach the current token.
+  useEffect(() => {
+    setTokenGetter(() => getToken())
+  }, [getToken])
+
   const { data, isLoading } = useQuery({
-    queryKey: ['me'],
+    queryKey: ['me', isSignedIn],
+    enabled: isLoaded,
     queryFn: async () => {
+      if (!isSignedIn) return null
       try {
         return await api.me()
       } catch (error) {
@@ -39,13 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    await api.logout()
-    // resetQueries (not clear) so the mounted 'me' observer refetches and the UI flips.
+    await clerk.signOut()
+    // resetQueries (not clear) so the mounted observers refetch and the UI flips.
     await queryClient.resetQueries()
   }
 
   return (
-    <AuthContext.Provider value={{ user: data ?? null, loading: isLoading, refresh, signOut }}>
+    <AuthContext.Provider
+      value={{ user: data ?? null, loading: !isLoaded || isLoading, refresh, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   )

@@ -1,8 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './lib/auth'
 import Home from './pages/Home'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import SignInPage from './pages/SignInPage'
 import ControlledRandom from './pages/ControlledRandom'
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -18,8 +17,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login/*" element={<SignInPage />} />
+      <Route path="/register/*" element={<SignInPage mode="sign-up" />} />
       <Route
         path="/controlled"
         element={

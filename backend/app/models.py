@@ -28,49 +28,14 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = _uuid_pk()
+    # Clerk owns the identity: credentials, verification and OAuth all live there.
+    # This row exists so the rest of the schema has a stable local id to hang off,
+    # and so a Clerk account can be renamed without rewriting every foreign key.
+    clerk_user_id: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     email: Mapped[str] = mapped_column(CITEXT, unique=True, nullable=False)
-    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
-    # Null until the emailed code is entered. Unverified users cannot sign in.
-    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-
-
-class EmailCode(Base):
-    """A one-time signup code. Only the hash is stored, and it is single-use."""
-
-    __tablename__ = "email_codes"
-
-    id: Mapped[uuid.UUID] = _uuid_pk()
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    code_hash: Mapped[str] = mapped_column(String(64), nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    attempts: Mapped[int] = mapped_column(Integer, server_default="0", nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-
-    __table_args__ = (Index("ix_email_codes_user_id", "user_id"),)
-
-
-class Session_(Base):
-    """Opaque server-side session. We store only a hash of the token."""
-
-    __tablename__ = "sessions"
-
-    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-
-    __table_args__ = (Index("ix_sessions_user_id", "user_id"),)
 
 
 class Show(Base):

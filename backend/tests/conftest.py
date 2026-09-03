@@ -1,7 +1,6 @@
 import os
 import uuid
 from collections.abc import Iterator
-from datetime import UTC, datetime
 
 TEST_DB_URL = os.environ.setdefault(
     "DATABASE_URL", "postgresql+psycopg://postgres@127.0.0.1:5433/swallow_test"
@@ -15,7 +14,7 @@ from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 from app.db import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Episode, Season, Show, User, UserShow  # noqa: E402
-from app.security import hash_password  # noqa: E402
+from app.security import get_current_user_optional  # noqa: E402
 
 engine = create_engine(TEST_DB_URL, future=True)
 TestSession = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False, future=True)
@@ -38,7 +37,7 @@ def db() -> Iterator[Session]:
         conn.execute(
             text(
                 "TRUNCATE watch_history, preset_shows, presets, user_shows, "
-                "episodes, seasons, shows, sessions, users RESTART IDENTITY CASCADE"
+                "episodes, seasons, shows, users RESTART IDENTITY CASCADE"
             )
         )
     session = TestSession()
@@ -48,14 +47,36 @@ def db() -> Iterator[Session]:
         session.close()
 
 
-@pytest.fixture
-def client(db: Session) -> Iterator[TestClient]:
-    """TestClient sharing the test's database session."""
+class FakeAuth:
+    """Stands in for Clerk during tests.
 
-    def _override() -> Iterator[Session]:
+    Verifying a real Clerk token would mean either shipping a secret key into CI or
+    mocking the JWKS fetch; overriding the dependency tests everything this codebase
+    actually owns -- who the request belongs to -- and leaves token verification to
+    the SDK that is responsible for it.
+    """
+
+    def __init__(self) -> None:
+        self.user: User | None = None
+
+    def sign_in(self, user: User | None) -> None:
+        self.user = user
+
+
+@pytest.fixture
+def auth() -> FakeAuth:
+    return FakeAuth()
+
+
+@pytest.fixture
+def client(db: Session, auth: FakeAuth) -> Iterator[TestClient]:
+    """TestClient sharing the test's database session, with auth stubbed out."""
+
+    def _override_db() -> Iterator[Session]:
         yield db
 
-    app.dependency_overrides[get_db] = _override
+    app.dependency_overrides[get_db] = _override_db
+    app.dependency_overrides[get_current_user_optional] = lambda: auth.user
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
@@ -65,27 +86,8 @@ def client(db: Session) -> Iterator[TestClient]:
 
 
 @pytest.fixture
-def sent_codes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
-    """Capture verification codes instead of mailing them."""
-    box: list[tuple[str, str]] = []
-    monkeypatch.setattr(
-        "app.routers.auth.send_verification_code",
-        lambda to_email, code: box.append((to_email, code)),
-    )
-    return box
-
-
-@pytest.fixture
 def user(db: Session) -> User:
-    u = User(
-        email="viewer@example.com",
-        password_hash=hash_password("hunter2hunter2"),
-        email_verified_at=datetime.now(UTC),
-    )
-    db.add(u)
-    db.commit()
-    db.refresh(u)
-    return u
+    return make_user(db, "viewer@example.com", clerk_user_id="user_viewer")
 
 
 _tvmaze_counter = iter(range(1000, 100_000))
@@ -139,31 +141,18 @@ def add_to_library(db: Session, user: User, show: Show, seasons: list[int]) -> U
     return row
 
 
-def make_verified_user(
-    db: Session, email: str, password: str = "hunter2hunter2"
-) -> User:
-    """A second account that skips the signup code -- verification has its own tests."""
-    u = User(
-        email=email,
-        password_hash=hash_password(password),
-        email_verified_at=datetime.now(UTC),
-    )
+def make_user(db: Session, email: str, clerk_user_id: str | None = None) -> User:
+    """A local row for a Clerk identity, as the first authenticated request creates."""
+    u = User(email=email, clerk_user_id=clerk_user_id or f"user_{uuid.uuid4().hex[:12]}")
     db.add(u)
     db.commit()
     db.refresh(u)
     return u
 
 
-def register(client: TestClient, email: str = "new@example.com", password: str = "hunter2hunter2"):
-    return client.post("/api/auth/register", json={"email": email, "password": password})
-
-
-def login_as(client: TestClient, user: User, password: str = "hunter2hunter2"):
-    response = client.post(
-        "/api/auth/login", json={"email": user.email, "password": password}
-    )
-    assert response.status_code == 200, response.text
-    return response
+def login_as(client: TestClient, user: User) -> None:
+    """Point the stubbed auth at a user. The real token check belongs to Clerk."""
+    app.dependency_overrides[get_current_user_optional] = lambda: user
 
 
 def new_uuid() -> uuid.UUID:

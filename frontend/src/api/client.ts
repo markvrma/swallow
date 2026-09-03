@@ -1,6 +1,5 @@
 import type {
   EpisodeWithShow,
-  PendingVerification,
   LibraryShow,
   PickMode,
   PickResponse,
@@ -10,6 +9,14 @@ import type {
   ShowSearchResult,
   User,
 } from './types'
+
+/** Clerk's token getter, handed over by AuthProvider once Clerk has loaded.
+ *  The api client is plain functions, not components, so it cannot use the hook. */
+let tokenGetter: (() => Promise<string | null>) | null = null
+
+export function setTokenGetter(getter: () => Promise<string | null>) {
+  tokenGetter = getter
+}
 
 export class ApiError extends Error {
   status: number
@@ -21,10 +28,16 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  // A short-lived Clerk session token, minted per request. Nothing is stored here:
+  // Clerk owns the session, and the API verifies the token against its JWKS.
+  const token = tokenGetter ? await tokenGetter() : null
+  const headers: Record<string, string> = {}
+  if (init?.body) headers['Content-Type'] = 'application/json'
+  if (token) headers.Authorization = `Bearer ${token}`
+
   const response = await fetch(path, {
-    credentials: 'include',
-    headers: init?.body ? { 'Content-Type': 'application/json' } : undefined,
     ...init,
+    headers: { ...headers, ...(init?.headers as Record<string, string> | undefined) },
   })
   if (!response.ok) {
     let detail = response.statusText
@@ -42,27 +55,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 // --- auth ---
-
-/** Creates the account and mails a code. There is no session until /verify. */
-export const register = (email: string, password: string) =>
-  request<PendingVerification>('/api/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  })
-
-export const verifyEmail = (email: string, code: string) =>
-  request<User>('/api/auth/verify', { method: 'POST', body: JSON.stringify({ email, code }) })
-
-export const resendCode = (email: string) =>
-  request<{ sent: boolean }>('/api/auth/resend', {
-    method: 'POST',
-    body: JSON.stringify({ email }),
-  })
-
-export const login = (email: string, password: string) =>
-  request<User>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
-
-export const logout = () => request<void>('/api/auth/logout', { method: 'POST' })
+//
+// Sign-up, sign-in, sign-out and OAuth all happen in Clerk. The only call left is
+// the one that resolves the Clerk identity to this app's account row.
 
 export const me = () => request<User>('/api/auth/me')
 

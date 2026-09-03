@@ -28,8 +28,9 @@ episode list is imported once when you add it.
 
 ## Stack
 
-- **Backend** — FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL · argon2 session
-  auth (httpOnly cookie)
+- **Auth** — Clerk (GitHub OAuth and anything else enabled in the dashboard). The
+  API verifies Clerk session tokens; it never sees a password.
+- **Backend** — FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL
 - **Frontend** — React 19 · Vite · TypeScript · Tailwind 4 · TanStack Query ·
   React Router
 
@@ -38,25 +39,36 @@ episode list is imported once when you add it.
 Requirements: Python 3.11+, [uv](https://docs.astral.sh/uv/), Node 20+, Docker
 (or any Postgres 16).
 
+Create a Clerk application first (<https://dashboard.clerk.com>), enable **GitHub**
+under *User & Authentication → Social connections*, and copy both keys.
+
 ```bash
 # 1. Database
 docker compose up -d postgres
 
 # 2. Backend  (http://127.0.0.1:8000, docs at /docs)
 cd backend
-cp .env.example .env
+cp .env.example .env          # then set CLERK_SECRET_KEY
 uv sync --extra dev
 uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
 
 # 3. Frontend  (http://localhost:5173, proxies /api to the backend)
 cd frontend
+cp .env.example .env.local    # then set VITE_CLERK_PUBLISHABLE_KEY
 npm install
 npm run dev
 ```
 
-Create an account, hit the **+** button, add a show (season selection is
+Sign in with GitHub, hit the **+** button, add a show (season selection is
 mandatory — that's the point), and press **Random**.
+
+### On accounts
+
+Clerk owns the identity. The first authenticated request creates the matching row
+in `users` (keyed by `clerk_user_id`), which is what the library, presets and watch
+history hang off — so an account can change email or add a login method in Clerk
+without touching any foreign key here.
 
 ## Tests
 

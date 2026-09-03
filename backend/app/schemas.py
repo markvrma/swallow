@@ -4,7 +4,7 @@ import uuid
 from datetime import date, datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # The duration buckets offered in the UI. `<=` rather than `<` on purpose:
 # TVmaze reports sitcoms as exactly 22 or 30 minutes, so a strict `< 30` would
@@ -21,37 +21,10 @@ class ORMModel(BaseModel):
 # --- auth -------------------------------------------------------------------
 
 
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=200)
-
-
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str = Field(max_length=200)
-
-
-class VerifyEmailRequest(BaseModel):
-    email: EmailStr
-    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
-
-
-class ResendCodeRequest(BaseModel):
-    email: EmailStr
-
-
-class PendingVerificationOut(BaseModel):
-    """Returned by register: the account exists but cannot sign in yet."""
-
-    email: str
-    verification_required: bool = True
-
-
 class UserOut(ORMModel):
     id: uuid.UUID
     email: str
     created_at: datetime
-    email_verified_at: datetime | None = None
 
 
 # --- catalogue --------------------------------------------------------------

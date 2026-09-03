@@ -1,213 +1,56 @@
 """End-to-end tests over the HTTP surface, with the provider never called."""
 
-from datetime import UTC, datetime, timedelta
-
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.models import EmailCode, Preset, PresetShow, User, WatchHistory
-from tests.conftest import (
-    add_to_library,
-    login_as,
-    make_show,
-    make_verified_user,
-    register,
-)
+from app.models import Preset, PresetShow, User, WatchHistory
+from app.security import ClerkIdentity, local_user_for
+from tests.conftest import add_to_library, login_as, make_show, make_user
 
 # --- auth -------------------------------------------------------------------
+#
+# Clerk owns sign-up, sign-in, verification and OAuth, so there is nothing here to
+# test but the seam: an unauthenticated request is refused, and a verified Clerk
+# identity resolves to exactly one local row.
 
 
-def test_register_needs_a_code_before_it_grants_a_session(
-    client: TestClient, sent_codes: list[tuple[str, str]]
-) -> None:
-    response = register(client)
-    assert response.status_code == 202
-    assert response.json() == {"email": "new@example.com", "verification_required": True}
-    # No session yet -- the account exists but is not usable.
+def test_protected_endpoints_refuse_an_anonymous_request(client: TestClient) -> None:
     assert client.get("/api/auth/me").status_code == 401
-
-    to_email, code = sent_codes[-1]
-    assert to_email == "new@example.com"
-    assert len(code) == 6 and code.isdigit()
-
-    verified = client.post(
-        "/api/auth/verify", json={"email": "new@example.com", "code": code}
-    )
-    assert verified.status_code == 200
-    assert verified.json()["email_verified_at"] is not None
-    assert client.get("/api/auth/me").status_code == 200
+    assert client.get("/api/me/shows").status_code == 401
+    assert client.post("/api/pick", json={"mode": "random"}).status_code == 401
 
 
-def test_login_is_refused_until_the_email_is_verified(
-    client: TestClient, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    response = client.post(
-        "/api/auth/login", json={"email": "new@example.com", "password": "hunter2hunter2"}
-    )
-    assert response.status_code == 403
-    assert response.json()["detail"] == "Email not verified"
-
-
-def test_a_wrong_code_is_rejected_and_burns_an_attempt(
-    client: TestClient, db: Session, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    _, code = sent_codes[-1]
-    wrong = "000000" if code != "000000" else "111111"
-
-    response = client.post("/api/auth/verify", json={"email": "new@example.com", "code": wrong})
-    assert response.status_code == 400
-    assert client.get("/api/auth/me").status_code == 401
-    assert db.query(EmailCode).one().attempts == 1
-
-    # The real code still works afterwards.
-    assert (
-        client.post(
-            "/api/auth/verify", json={"email": "new@example.com", "code": code}
-        ).status_code
-        == 200
-    )
-
-
-def test_the_code_dies_after_too_many_wrong_attempts(
-    client: TestClient, db: Session, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    _, code = sent_codes[-1]
-    wrong = "000000" if code != "000000" else "111111"
-
-    for _ in range(5):
-        client.post("/api/auth/verify", json={"email": "new@example.com", "code": wrong})
-
-    assert db.query(EmailCode).count() == 0
-    # Even the right code is useless now; a new one has to be requested.
-    assert (
-        client.post(
-            "/api/auth/verify", json={"email": "new@example.com", "code": code}
-        ).status_code
-        == 400
-    )
-
-
-def test_an_expired_code_is_rejected(
-    client: TestClient, db: Session, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    _, code = sent_codes[-1]
-    row = db.query(EmailCode).one()
-    row.expires_at = datetime.now(UTC) - timedelta(seconds=1)
-    db.commit()
-
-    response = client.post("/api/auth/verify", json={"email": "new@example.com", "code": code})
-    assert response.status_code == 400
-    assert "expired" in response.json()["detail"]
-
-
-def test_resending_replaces_the_code_and_is_rate_limited(
-    client: TestClient, db: Session, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    first = sent_codes[-1][1]
-
-    # Straight away: refused.
-    assert client.post("/api/auth/resend", json={"email": "new@example.com"}).status_code == 429
-
-    row = db.query(EmailCode).one()
-    row.created_at = datetime.now(UTC) - timedelta(seconds=120)
-    db.commit()
-
-    assert client.post("/api/auth/resend", json={"email": "new@example.com"}).status_code == 202
-    second = sent_codes[-1][1]
-    assert second != first
-    assert (
-        client.post(
-            "/api/auth/verify", json={"email": "new@example.com", "code": first}
-        ).status_code
-        == 400
-    )
-    assert (
-        client.post(
-            "/api/auth/verify", json={"email": "new@example.com", "code": second}
-        ).status_code
-        == 200
-    )
-
-
-def test_verify_cannot_hand_a_session_to_a_verified_account(
-    client: TestClient, user: User
-) -> None:
-    """Without this check, knowing an email would be enough to sign in."""
-    response = client.post(
-        "/api/auth/verify", json={"email": user.email, "code": "123456"}
-    )
-    assert response.status_code == 400
-    assert client.get("/api/auth/me").status_code == 401
-
-
-def test_resend_is_silent_about_unknown_addresses(
-    client: TestClient, sent_codes: list[tuple[str, str]]
-) -> None:
-    assert client.post("/api/auth/resend", json={"email": "nobody@example.com"}).status_code == 202
-    assert sent_codes == []
-
-
-def test_register_rejects_a_duplicate_verified_email(
-    client: TestClient, sent_codes: list[tuple[str, str]]
-) -> None:
-    register(client)
-    _, code = sent_codes[-1]
-    client.post("/api/auth/verify", json={"email": "new@example.com", "code": code})
-    assert register(client).status_code == 409
-
-
-def test_register_restarts_an_unverified_signup(
-    client: TestClient, sent_codes: list[tuple[str, str]]
-) -> None:
-    """A half-finished signup must not lock the address out forever."""
-    register(client)
-    assert register(client).status_code == 202
-    _, code = sent_codes[-1]
-    assert (
-        client.post(
-            "/api/auth/verify", json={"email": "new@example.com", "code": code}
-        ).status_code
-        == 200
-    )
-
-
-def test_register_rejects_a_short_password(client: TestClient) -> None:
-    response = client.post(
-        "/api/auth/register", json={"email": "a@example.com", "password": "short"}
-    )
-    assert response.status_code == 422
-
-
-def test_login_rejects_a_wrong_password(client: TestClient, user: User) -> None:
-    response = client.post(
-        "/api/auth/login", json={"email": user.email, "password": "wrongwrongwrong"}
-    )
-    assert response.status_code == 401
-
-
-def test_logout_clears_the_session(client: TestClient, user: User) -> None:
+def test_me_returns_the_local_account(client: TestClient, user: User) -> None:
     login_as(client, user)
-    assert client.post("/api/auth/logout").status_code == 204
-    assert client.get("/api/auth/me").status_code == 401
+    body = client.get("/api/auth/me").json()
+    assert body["email"] == user.email
+    assert body["id"] == str(user.id)
+    assert "password_hash" not in body and "clerk_user_id" not in body
 
 
-def test_protected_routes_reject_anonymous_callers(client: TestClient) -> None:
-    for method, path in [
-        ("get", "/api/auth/me"),
-        ("get", "/api/me/shows"),
-        ("get", "/api/me/cards"),
-        ("get", "/api/me/presets"),
-        ("post", "/api/pick"),
-        ("get", "/api/shows/search?q=test"),
-    ]:
-        kwargs = {"json": {"mode": "random"}} if method == "post" else {}
-        response = getattr(client, method)(path, **kwargs)
-        assert response.status_code == 401, f"{method.upper()} {path} was not protected"
+def test_first_request_creates_the_local_user(db: Session) -> None:
+    identity = ClerkIdentity(clerk_user_id="user_fresh", email="fresh@example.com")
+
+    created = local_user_for(db, identity)
+    assert created.email == "fresh@example.com"
+
+    again = local_user_for(db, identity)
+    assert again.id == created.id, "the same Clerk id must not create a second row"
+    assert db.query(User).filter(User.clerk_user_id == "user_fresh").count() == 1
+
+
+def test_an_email_change_in_clerk_updates_the_local_row(db: Session) -> None:
+    first = local_user_for(db, ClerkIdentity("user_moves", "old@example.com"))
+    second = local_user_for(db, ClerkIdentity("user_moves", "new@example.com"))
+    assert second.id == first.id
+    assert second.email == "new@example.com"
+
+
+def test_an_identity_without_an_email_still_gets_an_account(db: Session) -> None:
+    """A GitHub account with a private email arrives with no email claim."""
+    user = local_user_for(db, ClerkIdentity("user_private", None))
+    assert user.clerk_user_id == "user_private"
+    assert user.email  # a placeholder, but the account works
 
 
 # --- library ----------------------------------------------------------------
@@ -596,7 +439,7 @@ def test_presets_are_scoped_per_user(client: TestClient, db: Session, user: User
     db.add(PresetShow(preset_id=preset.id, show_id=show.id, seasons=[1]))
     db.commit()
 
-    login_as(client, make_verified_user(db, "intruder@example.com"))
+    login_as(client, make_user(db, "intruder@example.com"))
     assert client.get("/api/me/presets").json() == []
     assert (
         client.post("/api/pick", json={"mode": "preset", "preset_id": str(preset.id)}).status_code
