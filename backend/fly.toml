@@ -11,7 +11,7 @@ primary_region = 'iad'
   release_command = 'alembic upgrade head'
 
 [env]
-  CLERK_AUTHORIZED_PARTIES = 'https://swallow.vercel.app'
+  CLERK_AUTHORIZED_PARTIES = 'https://swallow-mocha.vercel.app'
   CORS_ORIGINS = ''
 
 [http_service]
