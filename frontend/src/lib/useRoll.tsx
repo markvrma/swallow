@@ -38,9 +38,17 @@ export function useRoll() {
     setError(null)
   }, [])
 
-  const putBack = useCallback(async () => {
+  // Rolling again should not remove the episode from the pool -- undo the
+  // watch-history row `pick` wrote for it before drawing the next one.
+  const rollAgain = useCallback(async () => {
     if (!result || !args) return
     await api.unwatchEpisode(result.episode.id)
+    run(args)
+  }, [result, args, run])
+
+  const neverShow = useCallback(async () => {
+    if (!result || !args) return
+    await api.neverShowEpisode(result.episode.id)
     run(args)
   }, [result, args, run])
 
@@ -49,8 +57,8 @@ export function useRoll() {
       result={result}
       loading={loading}
       error={error}
-      onRollAgain={() => run(args)}
-      onPutBack={putBack}
+      onRollAgain={rollAgain}
+      onNeverShow={neverShow}
       onClose={close}
     />
   ) : null

@@ -8,12 +8,12 @@ interface Props {
   loading: boolean
   error: string | null
   onRollAgain: () => void
-  onPutBack: () => void
+  onNeverShow: () => void
   onClose: () => void
 }
 
 /** The episode arrives as a box over whatever you were doing -- no new tab, no route. */
-export default function EpisodeBox({ result, loading, error, onRollAgain, onPutBack, onClose }: Props) {
+export default function EpisodeBox({ result, loading, error, onRollAgain, onNeverShow, onClose }: Props) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -102,16 +102,17 @@ export default function EpisodeBox({ result, loading, error, onRollAgain, onPutB
                 </a>
                 <button
                   onClick={onRollAgain}
+                  title="Puts this episode back in the pool and draws another"
                   className="border border-line px-5 py-3 text-sm text-ink-2 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
                 >
                   Roll again
                 </button>
                 <button
-                  onClick={onPutBack}
-                  title="Removes this episode from your watch history and rolls again"
+                  onClick={onNeverShow}
+                  title="Never draw this episode again, even after you've seen everything else"
                   className="border border-line px-5 py-3 text-sm text-ink-2 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
                 >
-                  Not tonight, put it back
+                  Never show this again
                 </button>
               </div>
 

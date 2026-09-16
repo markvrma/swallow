@@ -100,6 +100,9 @@ export const libraryCards = (limit = 5) => request<LibraryShow[]>(`/api/me/cards
 export const unwatchEpisode = (episodeId: string) =>
   request<void>(`/api/me/history/${episodeId}`, { method: 'DELETE' })
 
+export const neverShowEpisode = (episodeId: string) =>
+  request<void>(`/api/me/episodes/${episodeId}/never-show`, { method: 'POST' })
+
 export const resetShowHistory = (showId: string) =>
   request<void>(`/api/me/shows/${showId}/reset`, { method: 'POST' })
 
