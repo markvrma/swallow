@@ -61,6 +61,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const me = () => request<User>('/api/auth/me')
 
+export const deleteAccount = () => request<void>('/api/auth/me', { method: 'DELETE' })
+
 // --- catalogue ---
 
 export const searchShows = (q: string) =>

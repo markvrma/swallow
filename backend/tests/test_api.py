@@ -28,6 +28,12 @@ def test_me_returns_the_local_account(client: TestClient, user: User) -> None:
     assert "password_hash" not in body and "clerk_user_id" not in body
 
 
+def test_delete_me_removes_the_local_account(client: TestClient, user: User, db: Session) -> None:
+    login_as(client, user)
+    assert client.delete("/api/auth/me").status_code == 204
+    assert db.get(User, user.id) is None
+
+
 def test_first_request_creates_the_local_user(db: Session) -> None:
     identity = ClerkIdentity(clerk_user_id="user_fresh", email="fresh@example.com")
 
