@@ -46,7 +46,7 @@ export default function SeasonPicker({ seasons, selected, onChange }: Props) {
             title={`${season.episode_count} episodes`}
             className={`border px-2.5 py-1 font-mono text-[11px] ${
               selected.includes(season.number)
-                ? 'border-ink-2 bg-ink-2 text-on-solid'
+                ? 'border-ink-2 bg-card text-ink shadow-[0_0_6px_1px_var(--color-ink-2)]'
                 : 'border-line text-muted hover:border-hover-line hover:text-ink'
             }`}
           >
@@ -61,7 +61,7 @@ export default function SeasonPicker({ seasons, selected, onChange }: Props) {
             title={`${specials.episode_count} specials`}
             className={`border px-2.5 py-1 font-mono text-[11px] ${
               selected.includes(0)
-                ? 'border-ink-2 bg-ink-2 text-on-solid'
+                ? 'border-ink-2 bg-card text-ink shadow-[0_0_6px_1px_var(--color-ink-2)]'
                 : 'border-dashed border-line text-muted hover:border-hover-line hover:text-ink'
             }`}
           >
