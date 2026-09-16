@@ -48,9 +48,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 title="Settings"
                 className="flex h-[26px] w-[26px] items-center justify-center border border-line text-ink-3 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-                  <circle cx="8" cy="8" r="2.3" />
-                  <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7 3.6 3.6" />
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+                  <path d="M8 1.5c.38 0 .75.02 1.12.07l.36 1.53c.5.14.98.34 1.42.6l1.36-.78c.58.44 1.1.96 1.54 1.54l-.78 1.36c.26.44.46.92.6 1.42l1.53.36c.05.37.07.74.07 1.12s-.02.75-.07 1.12l-1.53.36c-.14.5-.34.98-.6 1.42l.78 1.36a7.5 7.5 0 0 1-1.54 1.54l-1.36-.78c-.44.26-.92.46-1.42.6l-.36 1.53c-.37.05-.74.07-1.12.07s-.75-.02-1.12-.07l-.36-1.53a5.5 5.5 0 0 1-1.42-.6l-1.36.78a7.5 7.5 0 0 1-1.54-1.54l.78-1.36a5.5 5.5 0 0 1-.6-1.42l-1.53-.36A7.5 7.5 0 0 1 .5 8c0-.38.02-.75.07-1.12l1.53-.36c.14-.5.34-.98.6-1.42l-.78-1.36c.44-.58.96-1.1 1.54-1.54l1.36.78c.44-.26.92-.46 1.42-.6l.36-1.53C7.25 1.52 7.62 1.5 8 1.5Z" />
+                  <circle cx="8" cy="8" r="2.1" />
                 </svg>
               </Link>
               <button
