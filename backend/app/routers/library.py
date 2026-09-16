@@ -22,6 +22,7 @@ from app.services.picker import (
     build_show_pool,
     count_pool,
     count_remaining,
+    exclude_episode,
     reset_pool_history,
 )
 
@@ -196,6 +197,12 @@ def unwatch_episode(episode_id: uuid.UUID, user: CurrentUser, db: DbSession):
             status_code=status.HTTP_404_NOT_FOUND, detail="Episode is not in your history"
         )
     db.commit()
+
+
+@router.post("/episodes/{episode_id}/never-show", status_code=status.HTTP_204_NO_CONTENT)
+def never_show_episode(episode_id: uuid.UUID, user: CurrentUser, db: DbSession):
+    """Exclude an episode from this user's rolls forever, even across pool resets."""
+    exclude_episode(db, user.id, episode_id)
 
 
 @router.post("/shows/{show_id}/reset", status_code=status.HTTP_204_NO_CONTENT)

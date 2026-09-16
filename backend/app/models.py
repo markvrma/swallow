@@ -202,3 +202,25 @@ class WatchHistory(Base):
         UniqueConstraint("user_id", "episode_id", name="uq_watch_history_user_episode"),
         Index("ix_watch_history_user_id", "user_id"),
     )
+
+
+class EpisodeExclusion(Base):
+    """An episode a user never wants served. Excluded even after a pool's history resets."""
+
+    __tablename__ = "episode_exclusions"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    episode_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("episodes.id", ondelete="CASCADE"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "episode_id", name="uq_episode_exclusion_user_episode"),
+        Index("ix_episode_exclusions_user_id", "user_id"),
+    )

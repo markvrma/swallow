@@ -18,7 +18,7 @@ from sqlalchemy import Select, and_, delete, func, or_, select, tuple_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from app.models import Episode, Preset, PresetShow, Show, UserShow, WatchHistory
+from app.models import Episode, EpisodeExclusion, Preset, PresetShow, Show, UserShow, WatchHistory
 
 # Season 0 is TVmaze's bucket for specials. They stay out of pools unless a user
 # explicitly asks for season 0.
@@ -128,6 +128,11 @@ def _pool_filter(pool: Pool):
 
 def _eligible_query(pool: Pool, user_id: uuid.UUID, *, exclude_seen: bool) -> Select:
     stmt = select(Episode).where(_pool_filter(pool))
+    stmt = stmt.where(
+        ~select(EpisodeExclusion.id)
+        .where(EpisodeExclusion.user_id == user_id, EpisodeExclusion.episode_id == Episode.id)
+        .exists()
+    )
     if exclude_seen:
         stmt = stmt.where(
             ~select(WatchHistory.id)
@@ -235,6 +240,16 @@ def pick(db: Session, pool: Pool, user_id: uuid.UUID) -> PickResult:
 
     db.commit()
     return PickResult(episode=episode, pool_reset=pool_reset)
+
+
+def exclude_episode(db: Session, user_id: uuid.UUID, episode_id: uuid.UUID) -> None:
+    """Never serve this episode to this user again, even across pool resets."""
+    db.execute(
+        insert(EpisodeExclusion)
+        .values(user_id=user_id, episode_id=episode_id)
+        .on_conflict_do_nothing(constraint="uq_episode_exclusion_user_episode")
+    )
+    db.commit()
 
 
 def sample_library_shows(db: Session, user_id: uuid.UUID, limit: int = 5) -> list[Show]:
