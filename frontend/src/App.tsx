@@ -3,6 +3,7 @@ import { useAuth } from './lib/auth'
 import Home from './pages/Home'
 import SignInPage from './pages/SignInPage'
 import ControlledRandom from './pages/ControlledRandom'
+import SettingsPage from './pages/SettingsPage'
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -24,6 +25,14 @@ export default function App() {
         element={
           <Protected>
             <ControlledRandom />
+          </Protected>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <Protected>
+            <SettingsPage />
           </Protected>
         }
       />

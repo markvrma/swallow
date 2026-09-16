@@ -28,6 +28,7 @@ logger = logging.getLogger("swallow.auth")
 
 _settings = get_settings()
 _clerk = Clerk(bearer_auth=_settings.clerk_secret_key) if _settings.clerk_secret_key else None
+clerk_client = _clerk
 
 
 class ClerkIdentity:

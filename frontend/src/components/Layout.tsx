@@ -45,6 +45,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <>
               <span className="hidden h-[18px] w-px bg-line sm:block" />
               <span className="hidden text-xs text-muted sm:inline">{user.email}</span>
+              <Link
+                to="/settings"
+                title="Settings"
+                className="flex h-[26px] w-[26px] items-center justify-center border border-line text-ink-3 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
+                  <circle cx="8" cy="8" r="2.3" />
+                  <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7 3.6 3.6" />
+                </svg>
+              </Link>
               <button
                 onClick={() => signOut()}
                 className="border border-line px-3 py-1 text-xs text-ink-3 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
