@@ -43,8 +43,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <DeliberationTimer />
           {user && (
             <>
-              <span className="hidden h-[18px] w-px bg-line sm:block" />
-              <span className="hidden text-xs text-muted sm:inline">{user.email}</span>
               <button
                 onClick={() => signOut()}
                 className="border border-line px-3 py-1 text-xs text-ink-3 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
