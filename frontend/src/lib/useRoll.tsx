@@ -32,11 +32,15 @@ export function useRoll() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Dismissing without picking an action (Escape, click-out) is not a commitment
+  // to watch -- undo the watch-history row `pick` wrote so the episode stays in the pool.
   const close = useCallback(() => {
+    const episodeId = result?.episode.id
     setArgs(null)
     setResult(null)
     setError(null)
-  }, [])
+    if (episodeId) api.unwatchEpisode(episodeId).catch(() => {})
+  }, [result])
 
   // Rolling again should not remove the episode from the pool -- undo the
   // watch-history row `pick` wrote for it before drawing the next one.

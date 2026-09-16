@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { PickResponse } from '../api/types'
 import { episodeCode } from '../lib/format'
 import { stopDeliberating } from '../lib/deliberation'
@@ -14,13 +14,24 @@ interface Props {
 
 /** The episode arrives as a box over whatever you were doing -- no new tab, no route. */
 export default function EpisodeBox({ result, loading, error, onRollAgain, onNeverShow, onClose }: Props) {
+  // Clicking "Watch this one" opens JustWatch in a new tab but leaves the box open.
+  // Dismissing afterward (Escape, click-out) must not undo that commitment.
+  const committedRef = useRef(false)
+  useEffect(() => {
+    committedRef.current = false
+  }, [result?.episode.id])
+
+  const dismiss = () => {
+    if (!committedRef.current) onClose()
+  }
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') dismiss()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  })
 
   const episode = result?.episode
   const show = result?.show
@@ -30,7 +41,7 @@ export default function EpisodeBox({ result, loading, error, onRollAgain, onNeve
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-scrim p-4 pt-[8vh]"
-      onClick={onClose}
+      onClick={dismiss}
     >
       <div
         className="w-full max-w-3xl border border-line bg-bar"
@@ -38,7 +49,7 @@ export default function EpisodeBox({ result, loading, error, onRollAgain, onNeve
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-2.5">
           <span className="font-nerd text-[11px] uppercase tracking-[0.14em] text-muted">⠿ your episode</span>
-          <button onClick={onClose} className="font-mono text-xs text-muted hover:text-ink">
+          <button onClick={dismiss} className="font-mono text-xs text-muted hover:text-ink">
             close
           </button>
         </div>
@@ -53,7 +64,7 @@ export default function EpisodeBox({ result, loading, error, onRollAgain, onNeve
           <div className="px-5 py-12 text-center">
             <p className="text-sm text-timer">{error}</p>
             <button
-              onClick={onClose}
+              onClick={dismiss}
               className="mt-4 border border-line px-4 py-2 text-xs text-ink-2 hover:border-hover-line hover:bg-hover-ground hover:text-ink"
             >
               Back
@@ -93,7 +104,10 @@ export default function EpisodeBox({ result, loading, error, onRollAgain, onNeve
                   href={justwatch}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => stopDeliberating()}
+                  onClick={() => {
+                    committedRef.current = true
+                    stopDeliberating()
+                  }}
                   title="Stops the deliberation clock -- you've decided"
                   className="flex items-center gap-2.5 border border-bright bg-bright px-5 py-3 text-sm font-semibold text-white hover:bg-bright-hover"
                 >
