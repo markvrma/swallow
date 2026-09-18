@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Swallow Picker",
+  "version": "1.0.0",
+  "description": "Random and controlled-random episode picker for swallow.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnFHRAwUaiBJ9uE7/IbnIC7C4HksUqvEl4yMLuPU1OTs+yuXZ7KA/OLIFawA4/0CH3Q2fjapqwGcvCQLXTJ01wFjAZE8ZTJaiTfTXznMhBsOyY8kWEYqy2fsjbMj1IcagoDS9nHNdF9RG1JTm/vcQqjMxBFxkqhcdUtbCtsNda0cpMIL/Et8dTujTh1XuuRp80+XI2o1nvCh4er8YNmx3Ay1HdeTciR5S4AjJJ97uwbaJX4Ft9PyFAfRCwbJrLGjBZoMTBZitRU5Ej9rqEVPdKsWVukqhk2/unqN7Rp56/yqizcXCDUC3gQf8E29/Q3sAI1lTjYBbT8TwjyQ6FgghlQIDAQAB",
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "permissions": ["scripting"],
+  "host_permissions": ["https://swallow-mocha.vercel.app/*", "http://127.0.0.1:5173/*"]
+}
