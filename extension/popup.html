@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Swallow Picker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
+    <style>
+      :root {
+        --ground: #e4e2dc;
+        --bar: #dedbd3;
+        --raised: #edebe6;
+        --line: #c3bfb4;
+        --muted: #8a877d;
+        --ink: #26251f;
+        --ink-2: #4a483f;
+        --on-solid: #edebe6;
+        --bright: #5b2fc9;
+        --bright-hover: #46219f;
+        --timer: #b33124;
+        --hover-ground: #d7d4cb;
+        --hover-line: #7f7c72;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ground: #1b1b18;
+          --bar: #201f1c;
+          --raised: #232320;
+          --line: #33322c;
+          --muted: #6e6b62;
+          --ink: #d8d5cc;
+          --ink-2: #9a968b;
+          --on-solid: #1b1b18;
+          --bright: #8a63e8;
+          --bright-hover: #7450d0;
+          --timer: #d9584a;
+          --hover-ground: #2a2a26;
+          --hover-line: #55534b;
+        }
+      }
+      body {
+        width: 280px;
+        margin: 0;
+        padding: 14px;
+        font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        background: var(--ground);
+        color: var(--ink);
+      }
+      h2 {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        margin: 18px 0 8px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--raised);
+        color: var(--ink-2);
+        padding: 9px 10px;
+        border-radius: 0;
+        transition: background-color 110ms linear, border-color 110ms linear, color 110ms linear;
+      }
+      button:hover {
+        border-color: var(--hover-line);
+        background: var(--hover-ground);
+        color: var(--ink);
+      }
+      button.primary {
+        background: var(--bright);
+        border-color: var(--bright);
+        color: var(--on-solid);
+        width: 100%;
+        font-weight: 500;
+      }
+      button.primary:hover {
+        background: var(--bright-hover);
+        border-color: var(--bright-hover);
+        color: var(--on-solid);
+      }
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      li button {
+        width: 100%;
+        text-align: left;
+      }
+      .muted {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+      .error {
+        color: var(--timer);
+      }
+      .episode {
+        line-height: 1.55;
+        margin: 4px 0 16px;
+        font-size: 15px;
+      }
+      .actions {
+        display: flex;
+        gap: 6px;
+      }
+      .actions button {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="dist/popup.js"></script>
+  </body>
+</html>
