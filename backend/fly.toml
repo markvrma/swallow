@@ -12,7 +12,7 @@ primary_region = 'iad'
 
 [env]
   CLERK_AUTHORIZED_PARTIES = 'https://swallow-mocha.vercel.app'
-  CORS_ORIGINS = ''
+  CORS_ORIGINS = 'chrome-extension://bajpalhdckbjdbgkmkcjkmjdghniihdn'
 
 [http_service]
   internal_port = 8080
