@@ -16,7 +16,9 @@ if (!PUBLISHABLE_KEY) {
 }
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+  // Mutations (add/edit/delete show or preset) invalidate their own queries explicitly,
+  // so a plain remount -- e.g. revisiting Controlled random -- doesn't need a refetch.
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false, staleTime: 60_000 } },
 })
 
 createRoot(document.getElementById('root')!).render(
