@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import SignInPage from './pages/SignInPage'
 import ControlledRandom from './pages/ControlledRandom'
 import SettingsPage from './pages/SettingsPage'
+import SupportPage from './pages/SupportPage'
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -18,6 +19,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/support" element={<SupportPage />} />
       <Route path="/login/*" element={<SignInPage />} />
       <Route path="/register/*" element={<SignInPage mode="sign-up" />} />
       <Route
